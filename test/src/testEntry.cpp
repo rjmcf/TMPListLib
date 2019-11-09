@@ -139,4 +139,14 @@ int main()
     // Test both filter impls
     test_filter<filter_mr>();
     test_filter<filter_sr>();
+
+    // Test map
+    static_assert(std::is_same<map<IsInt, void>, void>(),
+        "Testing map on empty list");
+    static_assert(
+        std::is_same<
+            map<IsInt, make_t<int, char, float, int, double>>,
+            make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
+        >(),
+        "Testing map on IsInt and a larger list");
 }

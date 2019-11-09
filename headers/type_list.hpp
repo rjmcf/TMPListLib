@@ -189,4 +189,24 @@ struct FilterSR<FilterF, void>
     using Type = void;
 };
 
+/*
+ * Map function
+ */
+template <typename F, typename TList>
+struct Map;
+template <typename F, typename TList>
+using map = typename Map<F, TList>::Type;
+
+template <typename F, typename THead, typename TTail>
+struct Map<F, List<THead, TTail>>
+{
+    using Type = List<call<F, THead>, map<F, TTail>>;
+};
+
+template <typename F>
+struct Map<F, void>
+{
+    using Type = void;
+};
+
 #endif
