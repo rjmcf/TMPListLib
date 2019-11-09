@@ -209,4 +209,24 @@ struct Map<F, void>
     using Type = void;
 };
 
+/*
+ * Zip function
+ */
+template <typename TList1, typename TList2>
+struct Zip;
+template <typename TList1, typename TList2>
+using zip = typename Zip<TList1, TList2>::Type;
+
+template <typename THead1, typename TTail1, typename THead2, typename TTail2>
+struct Zip<List<THead1, TTail1>, List<THead2, TTail2>>
+{
+    using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2>>;
+};
+
+template<>
+struct Zip<void, void>
+{
+    using Type = void;
+};
+
 #endif

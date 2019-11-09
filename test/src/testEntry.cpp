@@ -149,4 +149,29 @@ int main()
             make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
         >(),
         "Testing map on IsInt and a larger list");
+
+    // Test multi-dimensional lists
+    static_assert(std::is_same<make_t<make_t<>>, List<void,void> >(),
+        "Testing the structure of a list containing an empty list");
+    static_assert(std::is_same<make_t<make_t<int>>, List< List<int,void>, void> >(),
+        "Testing the structure of a list containing one single element list");
+    static_assert(std::is_same<make_t<make_t<int, float>>, List< make_t<int,float>, void> >(),
+        "Testing the structure of a list containing one multi_element list");
+    static_assert(
+        std::is_same<
+            make_t<make_t<int, float>, make_t<char, double>>,
+            List< make_t<int,float>, List<make_t<char, double>,void> >
+        >(),
+        "Testing the structure of a list containing many multi_element lists");
+
+
+    // Test zip
+    static_assert(std::is_same<zip<void,void>, void>(),
+        "Testing zip on empty lists");
+    static_assert(
+        std::is_same<
+            zip<make_t<int, float, char>, make_t<int, char, double>>,
+            make_t<make_t<int,int>, make_t<float,char>, make_t<char,double>>
+        >(),
+        "Testing zip on larger lists");
 }
