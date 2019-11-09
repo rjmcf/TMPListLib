@@ -12,4 +12,15 @@ int main()
         "Testing tail on small list");
     static_assert(std::is_same<tail< List<float, List<int, void>> >, List<int, void>>(),
         "Testing tail on larger list");
+
+    static_assert(std::is_same<append<int, void>, List<int, void>>(),
+        "Testing append on empty list");
+    static_assert(std::is_same<append<float, List<int,void>>, List<int, List<float, void>>>(),
+        "Testing append on small list");
+    static_assert(
+        std::is_same<
+            append<float, List<char, List<int,void>> >,
+            List<char, List<int, List<float, void>>>
+        >(),
+        "Testing append on larger list");
 }
