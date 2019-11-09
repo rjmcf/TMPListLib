@@ -132,35 +132,59 @@ struct Select<Bool<false>, TFirst, TSecond>
  * Mutual Recursive Filter
  */
 template <typename ShouldInclude, typename FilterF, typename TList>
-struct FilterR_Impl;
+struct FilterMR_Impl;
 template <typename ShouldInclude, typename FilterF, typename TList>
-using filter_r_impl = typename FilterR_Impl<ShouldInclude, FilterF, TList>::Type;
+using filter_mr_impl = typename FilterMR_Impl<ShouldInclude, FilterF, TList>::Type;
 
 template <typename FilterF, typename TList>
-struct FilterR;
+struct FilterMR;
 template <typename FilterF, typename TList>
-using filter_r = typename FilterR<FilterF, TList>::Type;
+using filter_mr = typename FilterMR<FilterF, TList>::Type;
 
 template <typename FilterF, typename THead, typename TTail>
-struct FilterR_Impl<Bool<true>, FilterF, List<THead, TTail>>
+struct FilterMR_Impl<Bool<true>, FilterF, List<THead, TTail>>
 {
-    using Type = List<THead, filter_r<FilterF, TTail>>;
+    using Type = List<THead, filter_mr<FilterF, TTail>>;
 };
 
 template <typename FilterF, typename THead, typename TTail>
-struct FilterR_Impl<Bool<false>, FilterF, List<THead, TTail>>
+struct FilterMR_Impl<Bool<false>, FilterF, List<THead, TTail>>
 {
-    using Type = filter_r<FilterF, TTail>;
+    using Type = filter_mr<FilterF, TTail>;
 };
 
 template <typename FilterF, typename TList>
-struct FilterR
+struct FilterMR
 {
-    using Type = filter_r_impl<call<FilterF, head<TList>>, FilterF, TList>;
+    using Type = filter_mr_impl<call<FilterF, head<TList>>, FilterF, TList>;
 };
 
 template <typename FilterF>
-struct FilterR<FilterF, void>
+struct FilterMR<FilterF, void>
+{
+    using Type = void;
+};
+
+/*
+ * Simply Recursive Filter
+ */
+template<typename FilterF, typename TList>
+struct FilterSR;
+template<typename FilterF, typename TList>
+using filter_sr = typename FilterSR<FilterF, TList>::Type;
+
+template<typename FilterF, typename THead, typename TTail>
+struct FilterSR<FilterF, List<THead, TTail>>
+{
+    using Type = select_t<
+/*If*/   call<FilterF,THead>,
+/*Then*/ List<THead, filter_sr<FilterF,TTail>>,
+/*Else*/ filter_sr<FilterF,TTail>
+    >;
+};
+
+template<typename FilterF>
+struct FilterSR<FilterF, void>
 {
     using Type = void;
 };

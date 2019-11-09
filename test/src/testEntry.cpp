@@ -9,6 +9,19 @@ struct IsInt
     using Call = Bool<std::is_same<T, int>::value>;
 };
 
+template <template <typename FilterF, typename TList> class FilterImpl>
+constexpr void test_filter()
+{
+    static_assert(std::is_same<FilterImpl<IsInt, void>, void>(),
+        "Testing filter_impl applied to an empty list");
+    static_assert(
+        std::is_same<
+            FilterImpl<IsInt, make_t<int, float, char, int, double>>,
+            make_t<int, int>
+        >(),
+        "Testing applied to a longer list");
+}
+
 int main()
 {
     // Test list structure
@@ -123,13 +136,7 @@ int main()
     static_assert(std::is_same<select_t<Bool<false>, int, float>, float>(),
         "Testing that select correctly returns second");
 
-    // Test filter_r
-    static_assert(std::is_same<filter_r<IsInt, void>, void>(),
-        "Testing filter_r applied to an empty list");
-    static_assert(
-        std::is_same<
-            filter_r<IsInt, make_t<int, float, char, int, double>>,
-            make_t<int, int>
-        >(),
-        "Testing filter_r applied to a longer list");
+    // Test both filter impls
+    test_filter<filter_mr>();
+    test_filter<filter_sr>();
 }
