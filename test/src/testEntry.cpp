@@ -14,45 +14,57 @@ int main()
     static_assert(std::is_same<tail< List<float, List<int, void>> >, List<int, void>>(),
         "Testing tail on larger list");
 
+    // Test make_t
+    static_assert(std::is_same<make_t<>, void>(),
+        "Testing making an empty list");
+    static_assert(std::is_same<make_t<int>, List<int, void>>(),
+        "Testing making a single element list");
+    static_assert(
+        std::is_same<
+            make_t<int, float, char>,
+            List<int, List<float, List<char, void>>>
+        >(),
+        "Testing making a longer list");
+    static_assert(std::is_same<head< make_t<int, float, char> >, int>(),
+        "Testing head applied to make_t");
+    static_assert(std::is_same<tail< make_t<int, float, char> >, make_t<float, char> >(),
+        "Testing tail applied to make_t");
+
     // Test append
-    static_assert(std::is_same<append<int, void>, List<int, void>>(),
+    static_assert(std::is_same<append<int, void>, make_t<int>>(),
         "Testing append on empty list");
-    static_assert(std::is_same<append<float, List<int,void>>, List<int, List<float, void>>>(),
+    static_assert(std::is_same<append<float, make_t<int>>, make_t<int, float>>(),
         "Testing append on small list");
     static_assert(
         std::is_same<
-            append<float, List<char, List<int,void>> >,
-            List<char, List<int, List<float, void>>>
+            append<float, make_t<char, int> >,
+            make_t<char, int, float>
         >(),
         "Testing append on larger list");
     static_assert(std::is_same<AppendF::Call<int, void>, append<int, void>>(),
         "Testing that AppendF::Call works the same as append on an empty list");
-    static_assert(std::is_same<AppendF::Call<int, List<float,void>>, append<int, List<float, void>> >(),
+    static_assert(std::is_same<AppendF::Call<int, make_t<float>>, append<int, make_t<float>> >(),
         "Testing that AppendF::Call works the same as append on a small list");
 
     // Test concat
     static_assert(std::is_same<concat<void, void>, void>(),
         "Testing concat on two empty lists");
-    static_assert(std::is_same<concat<void, List<int, void>>, List<int, void> >(),
+    static_assert(std::is_same<concat<void, make_t<int>>, make_t<int> >(),
         "Testing concat when first list empty");
-    static_assert(std::is_same<concat<List<int, void>, void>, List<int, void> >(),
+    static_assert(std::is_same<concat<make_t<int>, void>, make_t<int> >(),
         "Testing concat when second list empty");
-    static_assert(
-        std::is_same<
-            concat< List<int, void>, List<float, void> >,
-            List<int, List<float, void>>
-        >(),
+    static_assert(std::is_same<concat<make_t<int>, make_t<float>>, make_t<int, float> >(),
         "Testing concat on two small lists");
     static_assert(
         std::is_same<
-            concat< List<int, List<char, void>>, List<float, List<double, void>> >,
-            List<int, List<char, List<float, List<double, void>>>>
+            concat< make_t<int, char>, make_t<float, double> >,
+            make_t<int, char, float, double>
         >(),
         "Testing concat on two larger lists");
     static_assert(
         std::is_same<
-            ConcatF::Call< List<int, List<char, void>>, List<float, List<double, void>> >,
-            concat< List<int, List<char, void>>, List<float, List<double, void>> >
+            ConcatF::Call< make_t<int, char>, make_t<float, double> >,
+            concat< make_t<int, char>, make_t<float, double> >
         >(),
         "Testing ConcatF::Call works the same as concat");
 
@@ -61,8 +73,8 @@ int main()
         "Testing that Val can store an int");
     static_assert(Val<char, 'r'>::Value == 'r',
         "Testing that Val can store a char");
-    static_assert(head< List<Val<int,45>, void> >::Value == 45,
+    static_assert(head< make_t<Val<int,45>> >::Value == 45,
         "Testing that Lists can store Vals");
-    static_assert(head<tail< List<Val<int,17>, List<Val<int,42>, void>>>>::Value == 42,
+    static_assert(head<tail< make_t<Val<int, 17>, Val<int, 42>> >>::Value == 42,
         "Testing that Lists can store Vals in their tails");
 }
