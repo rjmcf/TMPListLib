@@ -55,4 +55,14 @@ int main()
             concat< List<int, List<char, void>>, List<float, List<double, void>> >
         >(),
         "Testing ConcatF::Call works the same as concat");
+
+    // Test value semantics
+    static_assert(Val<int, 4>::Value == 4,
+        "Testing that Val can store an int");
+    static_assert(Val<char, 'r'>::Value == 'r',
+        "Testing that Val can store a char");
+    static_assert(head< List<Val<int,45>, void> >::Value == 45,
+        "Testing that Lists can store Vals");
+    static_assert(head<tail< List<Val<int,17>, List<Val<int,42>, void>>>>::Value == 42,
+        "Testing that Lists can store Vals in their tails");
 }

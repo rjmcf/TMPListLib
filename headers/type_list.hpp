@@ -66,4 +66,13 @@ struct ConcatF
     using Call = concat<TList1, TList2>;
 };
 
+/*
+ * Value Semantics
+ */
+template<typename T, T N>
+struct Val
+{
+    static constexpr T Value{N};
+};
+
 #endif
