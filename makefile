@@ -12,13 +12,13 @@ ENTRY_POINT = main
 TEST_ENTRY_POINT = testEntry
 
 run: allObjs
-	$(CXX) $(CFLAGS) $(OBJS) -o $(OBJ_DIR)/$(ENTRY_POINT) $(DEPS)
+	$(CXX) $(CFLAGS) $(OBJS) -o $(OBJ_DIR)/$(ENTRY_POINT)
 	$(OBJ_DIR)/$(ENTRY_POINT)
 
 allObjs: $(OBJS)
 
 runTests: allObjs allTestObjs
-	$(CXX) $(CFLAGS) $(filter-out $(OBJ_DIR)/$(ENTRY_POINT).o,$(OBJS)) $(TEST_OBJS) -o $(OBJ_DIR)/$(TEST_ENTRY_POINT) $(DEPS) $(TEST_DEPS)
+	$(CXX) $(CFLAGS) $(filter-out $(OBJ_DIR)/$(ENTRY_POINT).o,$(OBJS)) $(TEST_OBJS) -o $(OBJ_DIR)/$(TEST_ENTRY_POINT)
 	$(OBJ_DIR)/$(TEST_ENTRY_POINT)
 
 allTestObjs: $(TEST_OBJS)
