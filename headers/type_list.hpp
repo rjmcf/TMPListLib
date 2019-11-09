@@ -34,5 +34,10 @@ struct Append<T, void>
     using Type = List<T, void>;
 };
 
+struct AppendF
+{
+    template <typename T, typename TList>
+    using Call = append<T, TList>;
+};
 
 #endif

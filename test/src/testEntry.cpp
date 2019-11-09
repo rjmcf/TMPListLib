@@ -23,4 +23,8 @@ int main()
             List<char, List<int, List<float, void>>>
         >(),
         "Testing append on larger list");
+    static_assert(std::is_same<AppendF::Call<int, void>, append<int, void>>(),
+        "Testing that AppendF::Call works the same as append on an empty list");
+    static_assert(std::is_same<AppendF::Call<int, List<float,void>>, append<int, List<float, void>> >(),
+        "Testing that AppendF::Call works the same as append on a small list");
 }
