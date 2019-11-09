@@ -40,4 +40,30 @@ struct AppendF
     using Call = append<T, TList>;
 };
 
+/*
+ * Concatenate two lists
+ */
+template <typename TList1, typename TList2>
+struct Concat;
+template <typename TList1, typename TList2>
+using concat = typename Concat<TList1, TList2>::Type;
+
+template <typename THead, typename TTail, typename TList2>
+struct Concat<List<THead, TTail>, TList2>
+{
+    using Type = List<THead, concat<TTail, TList2>>;
+};
+
+template <typename TList2>
+struct Concat<void, TList2>
+{
+    using Type = TList2;
+};
+
+struct ConcatF
+{
+    template <typename TList1, typename TList2>
+    using Call = concat<TList1, TList2>;
+};
+
 #endif
