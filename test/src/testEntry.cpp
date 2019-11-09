@@ -116,8 +116,14 @@ int main()
         "Test that make_t applies to functions too");
     static_assert(call<head<make_t<IsInt>>, int>::Value,
         "Test that the head of a list of functions can be called");
-        
-    // Test FilterR
+
+    // Test select_t
+    static_assert(std::is_same<select_t<Bool<true>, int, float>, int>(),
+        "Testing that select correctly returns first");
+    static_assert(std::is_same<select_t<Bool<false>, int, float>, float>(),
+        "Testing that select correctly returns second");
+
+    // Test filter_r
     static_assert(std::is_same<filter_r<IsInt, void>, void>(),
         "Testing filter_r applied to an empty list");
     static_assert(
