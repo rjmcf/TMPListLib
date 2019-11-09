@@ -75,6 +75,22 @@ int main()
         >(),
         "Testing ConcatF::Call works the same as concat");
 
+    // Test call
+    static_assert(IsInt::Call<int>::Value,
+        "Testing that IsInt(int) correctly returns true");
+    static_assert(call<IsInt, int>::Value,
+        "Testing that call<IsInt, int> correctly returns true");
+    static_assert(!IsInt::Call<float>::Value,
+        "Testing that IsInt(float) correctly returns false");
+    static_assert(!call<IsInt, float>::Value,
+        "Testing that call<IsInt, float> correctly returns false");
+
+    // Test lists of functions
+    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
+        "Test that make_t applies to functions too");
+    static_assert(call<head<make_t<IsInt>>, int>::Value,
+        "Test that the head of a list of functions can be called");
+
     // Test value semantics
     static_assert(Val<int, 4>::Value == 4,
         "Testing that Val can store an int");
@@ -100,4 +116,14 @@ int main()
         "Test that make_t applies to functions too");
     static_assert(call<head<make_t<IsInt>>, int>::Value,
         "Test that the head of a list of functions can be called");
+        
+    // Test FilterR
+    static_assert(std::is_same<filter_r<IsInt, void>, void>(),
+        "Testing filter_r applied to an empty list");
+    static_assert(
+        std::is_same<
+            filter_r<IsInt, make_t<int, float, char, int, double>>,
+            make_t<int, int>
+        >(),
+        "Testing filter_r applied to a longer list");
 }

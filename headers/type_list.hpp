@@ -108,4 +108,41 @@ template <bool B>
 struct Bool : public Val<bool, B>
 {};
 
+/*
+ * Mutual Recursive Filter
+ */
+template <typename ShouldInclude, typename FilterF, typename TList>
+struct FilterR_Impl;
+template <typename ShouldInclude, typename FilterF, typename TList>
+using filter_r_impl = typename FilterR_Impl<ShouldInclude, FilterF, TList>::Type;
+
+template <typename FilterF, typename TList>
+struct FilterR;
+template <typename FilterF, typename TList>
+using filter_r = typename FilterR<FilterF, TList>::Type;
+
+template <typename FilterF, typename THead, typename TTail>
+struct FilterR_Impl<Bool<true>, FilterF, List<THead, TTail>>
+{
+    using Type = List<THead, filter_r<FilterF, TTail>>;
+};
+
+template <typename FilterF, typename THead, typename TTail>
+struct FilterR_Impl<Bool<false>, FilterF, List<THead, TTail>>
+{
+    using Type = filter_r<FilterF, TTail>;
+};
+
+template <typename FilterF, typename TList>
+struct FilterR
+{
+    using Type = filter_r_impl<call<FilterF, head<TList>>, FilterF, TList>;
+};
+
+template <typename FilterF>
+struct FilterR<FilterF, void>
+{
+    using Type = void;
+};
+
 #endif
