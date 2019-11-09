@@ -2,6 +2,13 @@
 
 #include "type_list.hpp"
 
+// Test function, returns Bool<true> if passed int type.
+struct IsInt
+{
+    template<typename T>
+    using Call = Bool<std::is_same<T, int>::value>;
+};
+
 int main()
 {
     // Test list structure
@@ -77,4 +84,20 @@ int main()
         "Testing that Lists can store Vals");
     static_assert(head<tail< make_t<Val<int, 17>, Val<int, 42>> >>::Value == 42,
         "Testing that Lists can store Vals in their tails");
+
+    // Test call
+    static_assert(IsInt::Call<int>::Value,
+        "Testing that IsInt(int) correctly returns true");
+    static_assert(call<IsInt, int>::Value,
+        "Testing that call<IsInt, int> correctly returns true");
+    static_assert(!IsInt::Call<float>::Value,
+        "Testing that IsInt(float) correctly returns false");
+    static_assert(!call<IsInt, float>::Value,
+        "Testing that call<IsInt, float> correctly returns false");
+
+    // Test lists of functions
+    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
+        "Test that make_t applies to functions too");
+    static_assert(call<head<make_t<IsInt>>, int>::Value,
+        "Test that the head of a list of functions can be called");
 }

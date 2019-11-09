@@ -87,6 +87,12 @@ struct ConcatF
 };
 
 /*
+ * Call function helper
+ */
+template<typename F, typename... Args>
+using call = typename F::template Call<Args...>;
+
+/*
  * Value Semantics
  */
 template<typename T, T N>
@@ -94,5 +100,12 @@ struct Val
 {
     static constexpr T Value{N};
 };
+
+/*
+ * Bool Values
+ */
+template <bool B>
+struct Bool : public Val<bool, B>
+{};
 
 #endif
