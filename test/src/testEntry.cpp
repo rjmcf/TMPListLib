@@ -1,6 +1,8 @@
 #include <type_traits>
 
 #include "type_list.hpp"
+#include "functions.hpp"
+#include "list_fns.hpp"
 
 // Test function, returns Bool<true> if passed int type.
 struct IsInt
@@ -24,6 +26,9 @@ constexpr void test_filter()
 
 int main()
 {
+    /*
+     * Testing List basics
+     */
     // Test list structure
     static_assert(std::is_same<head< List<int, void> >, int>(),
         "Testing head on small list");
@@ -50,6 +55,62 @@ int main()
     static_assert(std::is_same<tail< make_t<int, float, char> >, make_t<float, char> >(),
         "Testing tail applied to make_t");
 
+    // Test multi-dimensional lists
+    static_assert(std::is_same<make_t<make_t<>>, List<void,void> >(),
+        "Testing the structure of a list containing an empty list");
+    static_assert(std::is_same<make_t<make_t<int>>, List< List<int,void>, void> >(),
+        "Testing the structure of a list containing one single element list");
+    static_assert(std::is_same<make_t<make_t<int, float>>, List< make_t<int,float>, void> >(),
+        "Testing the structure of a list containing one multi_element list");
+    static_assert(
+        std::is_same<
+            make_t<make_t<int, float>, make_t<char, double>>,
+            List< make_t<int,float>, List<make_t<char, double>,void> >
+        >(),
+        "Testing the structure of a list containing many multi_element lists");
+
+    // Test value semantics
+    static_assert(Val<int, 4>::Value == 4,
+        "Testing that Val can store an int");
+    static_assert(Val<char, 'r'>::Value == 'r',
+        "Testing that Val can store a char");
+    static_assert(head< make_t<Val<int,45>> >::Value == 45,
+        "Testing that Lists can store Vals");
+    static_assert(head<tail< make_t<Val<int, 17>, Val<int, 42>> >>::Value == 42,
+        "Testing that Lists can store Vals in their tails");
+
+    /*
+     * Testing Functions
+     */
+     // Test lists of functions
+     static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
+         "Test that make_t applies to functions too");
+     static_assert(call<head<make_t<IsInt>>, int>::Value,
+         "Test that the head of a list of functions can be called");
+
+     // Test select_t
+     static_assert(std::is_same<select_t<Bool<true>, int, float>, int>(),
+         "Testing that select correctly returns first");
+     static_assert(std::is_same<select_t<Bool<false>, int, float>, float>(),
+         "Testing that select correctly returns second");
+
+     // Test call
+     static_assert(IsInt::Call<int>::Value,
+         "Testing that IsInt(int) correctly returns true");
+     static_assert(call<IsInt, int>::Value,
+         "Testing that call<IsInt, int> correctly returns true");
+     static_assert(!IsInt::Call<float>::Value,
+         "Testing that IsInt(float) correctly returns false");
+     static_assert(!call<IsInt, float>::Value,
+         "Testing that call<IsInt, float> correctly returns false");
+     static_assert(std::is_same<call<SelectF, Bool<true>, int, float>, int>(),
+         "Testing that call<IsInt, float> correctly returns false");
+     static_assert(std::is_same<call<SelectF, Bool<false>, int, float>, float>(),
+         "Testing that call<IsInt, float> correctly returns false");
+
+    /*
+     * Testing functions on lists
+     */
     // Test append
     static_assert(std::is_same<append<int, void>, make_t<int>>(),
         "Testing append on empty list");
@@ -88,54 +149,6 @@ int main()
         >(),
         "Testing ConcatF::Call works the same as concat");
 
-    // Test call
-    static_assert(IsInt::Call<int>::Value,
-        "Testing that IsInt(int) correctly returns true");
-    static_assert(call<IsInt, int>::Value,
-        "Testing that call<IsInt, int> correctly returns true");
-    static_assert(!IsInt::Call<float>::Value,
-        "Testing that IsInt(float) correctly returns false");
-    static_assert(!call<IsInt, float>::Value,
-        "Testing that call<IsInt, float> correctly returns false");
-
-    // Test lists of functions
-    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
-        "Test that make_t applies to functions too");
-    static_assert(call<head<make_t<IsInt>>, int>::Value,
-        "Test that the head of a list of functions can be called");
-
-    // Test value semantics
-    static_assert(Val<int, 4>::Value == 4,
-        "Testing that Val can store an int");
-    static_assert(Val<char, 'r'>::Value == 'r',
-        "Testing that Val can store a char");
-    static_assert(head< make_t<Val<int,45>> >::Value == 45,
-        "Testing that Lists can store Vals");
-    static_assert(head<tail< make_t<Val<int, 17>, Val<int, 42>> >>::Value == 42,
-        "Testing that Lists can store Vals in their tails");
-
-    // Test call
-    static_assert(IsInt::Call<int>::Value,
-        "Testing that IsInt(int) correctly returns true");
-    static_assert(call<IsInt, int>::Value,
-        "Testing that call<IsInt, int> correctly returns true");
-    static_assert(!IsInt::Call<float>::Value,
-        "Testing that IsInt(float) correctly returns false");
-    static_assert(!call<IsInt, float>::Value,
-        "Testing that call<IsInt, float> correctly returns false");
-
-    // Test lists of functions
-    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
-        "Test that make_t applies to functions too");
-    static_assert(call<head<make_t<IsInt>>, int>::Value,
-        "Test that the head of a list of functions can be called");
-
-    // Test select_t
-    static_assert(std::is_same<select_t<Bool<true>, int, float>, int>(),
-        "Testing that select correctly returns first");
-    static_assert(std::is_same<select_t<Bool<false>, int, float>, float>(),
-        "Testing that select correctly returns second");
-
     // Test both filter impls
     test_filter<filter_mr>();
     test_filter<filter_sr>();
@@ -150,21 +163,6 @@ int main()
         >(),
         "Testing map on IsInt and a larger list");
 
-    // Test multi-dimensional lists
-    static_assert(std::is_same<make_t<make_t<>>, List<void,void> >(),
-        "Testing the structure of a list containing an empty list");
-    static_assert(std::is_same<make_t<make_t<int>>, List< List<int,void>, void> >(),
-        "Testing the structure of a list containing one single element list");
-    static_assert(std::is_same<make_t<make_t<int, float>>, List< make_t<int,float>, void> >(),
-        "Testing the structure of a list containing one multi_element list");
-    static_assert(
-        std::is_same<
-            make_t<make_t<int, float>, make_t<char, double>>,
-            List< make_t<int,float>, List<make_t<char, double>,void> >
-        >(),
-        "Testing the structure of a list containing many multi_element lists");
-
-
     // Test zip
     static_assert(std::is_same<zip<void,void>, void>(),
         "Testing zip on empty lists");
@@ -175,7 +173,7 @@ int main()
         >(),
         "Testing zip on larger lists");
 
-    // Test IsList
+    // Test is_list
     static_assert(!is_list<bool>::Value,
         "Testing that is_list returns false correctly");
     static_assert(is_list<void>::Value,
