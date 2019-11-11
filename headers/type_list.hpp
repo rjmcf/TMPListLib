@@ -229,4 +229,65 @@ struct Zip<void, void>
     using Type = void;
 };
 
+/*
+ * IsList function
+ */
+template <typename T>
+struct IsList
+{
+    using Type = Bool<false>;
+};
+
+template <typename THead, typename TTail>
+struct IsList<List<THead, TTail>>
+{
+    using Type = Bool<true>;
+};
+
+template <>
+struct IsList<void>
+{
+    using Type = Bool<true>;
+};
+
+template <typename T>
+using is_list = typename IsList<T>::Type;
+
+/*
+ * Flatten function
+ */
+template <typename TList>
+struct Flatten;
+template <typename TList>
+using flatten = typename Flatten<TList>::Type;
+
+template<typename IsList, typename TList>
+struct FlattenImpl;
+template<typename IsList, typename TList>
+using flatten_impl = template FlattenImpl<IsList, TList>::Type;
+
+template<typename THead, typename TTail>
+struct FlattenImpl<Bool<true>, List<THead, TTail>>
+{
+    using Type = concat<flatten<THead>, flatten<TTail>>;
+};
+
+template<typename THead, typename TTail>
+struct FlattenImpl<Bool<false>, List<THead, TTail>>
+{
+    using Type = List<THead, flatten<TTail>>;
+};
+
+template<typename THead, typename TTail>
+struct Flatten< List<THead, TTail> >
+{
+    using Type = flatten_impl<is_list<THead>, List<THead, TTail>>;
+};
+
+template<>
+struct Flatten<void>
+{
+    using Type = void;
+};
+
 #endif

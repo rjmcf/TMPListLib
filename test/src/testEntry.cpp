@@ -174,4 +174,40 @@ int main()
             make_t<make_t<int,int>, make_t<float,char>, make_t<char,double>>
         >(),
         "Testing zip on larger lists");
+
+    // Test IsList
+    static_assert(!is_list<bool>::Value,
+        "Testing that is_list returns false correctly");
+    static_assert(is_list<void>::Value,
+        "Testing that is_list returns true for an empty list");
+    static_assert(is_list<List<bool, void>>::Value,
+        "Testing that is_list returns true for a non-empty list");
+
+    // Test flatten
+    static_assert(std::is_same<flatten<void>, void>(),
+        "Testing flatten on empty list");
+    static_assert(std::is_same<flatten<make_t<make_t<>>>, void>(),
+        "Testing flatten on a list containing an empty list");
+    static_assert(std::is_same<flatten<make_t<make_t<make_t<>>>>, void>(),
+        "Testing flatten on a list containing a list containing an empty list");
+    static_assert(std::is_same<flatten<make_t<int, float>>, make_t<int, float>>(),
+        "Testing flatten on a flat list");
+    static_assert(
+        std::is_same<
+            flatten<make_t<make_t<int, float>, make_t<int, float>>>,
+            make_t<int, float, int, float>
+        >(),
+        "Testing flatten on a 2D list");
+    static_assert(
+        std::is_same<
+            flatten<make_t<make_t<int, float>, char, make_t<int, float>>>,
+            make_t<int, float, char, int, float>
+        >(),
+        "Testing flatten on a mixed list");
+    static_assert(
+        std::is_same<
+            flatten<make_t<make_t<make_t<int>, make_t<float, int>>, make_t<make_t<float, double>>>>,
+            make_t<int, float, int, float, double>
+        >(),
+        "Testing flatten on a 3D list");
 }
