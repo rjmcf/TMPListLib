@@ -2,6 +2,7 @@
 #define LIST_FNS_HPP
 
 #include "type_list.hpp"
+#include "functions.hpp"
 
 /*
  * Append to a list
