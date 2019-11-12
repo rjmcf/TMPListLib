@@ -6,11 +6,11 @@
 template <template <typename FilterF, typename TList> class FilterImpl>
 constexpr void test_filter()
 {
-    static_assert(std::is_same<FilterImpl<IsInt, void>, void>(),
+    static_assert(std::is_same<FilterImpl<IsIntF, void>, void>(),
         "Testing filter_impl applied to an empty list");
     static_assert(
         std::is_same<
-            FilterImpl<IsInt, make_t<int, float, char, int, double>>,
+            FilterImpl<IsIntF, make_t<int, float, char, int, double>>,
             make_t<int, int>
         >(),
         "Testing applied to a longer list");
@@ -25,9 +25,9 @@ void test_list_fns()
         "Testing that Lists can store Vals in their tails");
 
     // Test lists of functions
-    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
+    static_assert(std::is_same<make_t<IsIntF>, List<IsIntF, void> >(),
         "Test that make_t applies to functions too");
-    static_assert(call<head<make_t<IsInt>>, int>::Value,
+    static_assert(call<head<make_t<IsIntF>>, int>::Value,
         "Test that the head of a list of functions can be called");
 
     // Test is_list
@@ -83,11 +83,11 @@ void test_list_fns()
     test_filter<filter>();
 
     // Test map
-    static_assert(std::is_same<map<IsInt, void>, void>(),
+    static_assert(std::is_same<map<IsIntF, void>, void>(),
         "Testing map on empty list");
     static_assert(
         std::is_same<
-            map<IsInt, make_t<int, char, float, int, double>>,
+            map<IsIntF, make_t<int, char, float, int, double>>,
             make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
         >(),
         "Testing map on IsInt and a larger list");
