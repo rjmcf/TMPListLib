@@ -5,6 +5,35 @@
 #include "functions.hpp"
 
 /*
+ * IsList function
+ */
+template <typename T>
+struct IsList
+{
+    using Type = Bool<false>;
+};
+template <typename T>
+using is_list = typename IsList<T>::Type;
+
+template <typename THead, typename TTail>
+struct IsList<List<THead, TTail>>
+{
+    using Type = Bool<true>;
+};
+
+template <>
+struct IsList<void>
+{
+    using Type = Bool<true>;
+};
+
+struct IsListF
+{
+    template <typename T>
+    using Call = is_list<T>;
+};
+
+/*
  * Append to a list
  */
 template <typename T, typename TList>
@@ -193,35 +222,6 @@ struct ZipF
 {
     template <typename TList1, typename TList2>
     using Call = zip<TList1, TList2>;
-};
-
-/*
- * IsList function
- */
-template <typename T>
-struct IsList
-{
-    using Type = Bool<false>;
-};
-template <typename T>
-using is_list = typename IsList<T>::Type;
-
-template <typename THead, typename TTail>
-struct IsList<List<THead, TTail>>
-{
-    using Type = Bool<true>;
-};
-
-template <>
-struct IsList<void>
-{
-    using Type = Bool<true>;
-};
-
-struct IsListF
-{
-    template <typename T>
-    using Call = is_list<T>;
 };
 
 /*

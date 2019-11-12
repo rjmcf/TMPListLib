@@ -2,10 +2,29 @@
 #define FUNCTIONS_HPP
 
 /*
- * Call function helper
+ * Value Semantics
  */
-template<typename F, typename... Args>
-using call = typename F::template Call<Args...>;
+template<typename T, T N>
+struct Val
+{
+    static constexpr T Value{N};
+};
+
+/*
+ * Bool Values
+ */
+template <bool B>
+struct Bool : public Val<bool, B>
+{};
+
+/*
+ * Test function, returns Bool<true> if passed int type.
+ */
+struct IsInt
+{
+    template<typename T>
+    using Call = Bool<std::is_same<T, int>::value>;
+};
 
 /*
  * Select from two values based on condition
@@ -32,5 +51,11 @@ struct SelectF
     template <typename TakeFirst, typename TFirst, typename TSecond>
     using Call = select_t<TakeFirst, TFirst, TSecond>;
 };
+
+/*
+ * Call function helper
+ */
+template<typename F, typename... Args>
+using call = typename F::template Call<Args...>;
 
 #endif
