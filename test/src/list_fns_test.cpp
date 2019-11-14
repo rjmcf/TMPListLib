@@ -30,6 +30,24 @@ void test_list_fns()
     static_assert(call<head<make_t<IsIntF>>, int>::Value,
         "Test that the head of a list of functions can be called");
 
+    // Test list of curried functions
+    static_assert(std::is_same<make_t<Curry<EqualsF>>, List<Curry<EqualsF>, void> >(),
+        "Test that make_t applies to curried functions too");
+    static_assert(
+        std::is_same<
+            call< head< make_t<Curry<EqualsF>> >, int>,
+            call< Curry<EqualsF>, int>
+        >(),
+        "Test that the head of a list of curried functions can be called");
+    static_assert(
+        std::is_same<
+            call< call< head< make_t<Curry<EqualsF>> >, int>, int>,
+            call< call< Curry<EqualsF>, int>, int>
+        >(),
+        "Test that the head of a list of curried functions can be called mutliple times");
+    static_assert(call< call< head< make_t<Curry<EqualsF>> >, int>, int>::Type::Value,
+        "Test that the head of a list of curried functions can be called mutliple times and return a value");
+
     // Test is_list
     static_assert(!is_list<bool>::Value,
         "Testing that is_list returns false correctly");
