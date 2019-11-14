@@ -18,20 +18,20 @@ struct Bool : public Val<bool, B>
 {};
 
 /*
- * Test function, returns Bool<true> if passed int type.
+ * Test function, returns Bool<true> if passed the same type twice.
  */
-template<typename T>
-struct IsInt
+template<typename T, typename U>
+struct Equals
 {
-    using Type = Bool<std::is_same<T, int>::value>;
+    using Type = Bool<std::is_same<T, U>::value>;
 };
-template<typename T>
-using is_int = typename IsInt<T>::Type;
+template<typename T, typename U>
+using equals = typename Equals<T, U>::Type;
 
-struct IsIntF
+struct EqualsF
 {
-    template<typename T>
-    using Call = is_int<T>;
+    template<typename T, typename U>
+    using Call = equals<T, U>;
 };
 
 /*
@@ -96,6 +96,21 @@ struct Curry
 {
     template <typename... ArgsToCome>
     using Call = CurryImpl<decltype(is_valid_call<F, ArgsToCome...>(nullptr)), F, ArgsToCome...>;
+};
+
+/*
+ * Test curried function, returns Bool<true> if passed int
+ */
+template <typename T>
+struct IsInt
+{
+    using Type = typename Curry<EqualsF>::Call<int>::Call<T>::Type;
+};
+
+struct IsIntF
+{
+    template <typename T>
+    using Call = typename IsInt<T>::Type;
 };
 
 #endif
