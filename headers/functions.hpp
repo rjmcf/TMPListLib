@@ -111,12 +111,12 @@ public:
 };
 
 /*
- * Test curried function, returns Bool<true> if passed int
+ * Test curried function, returns Bool<true> if passed Int<0>
  */
-struct IsInt
+struct IsZero
 {
     template <typename T>
-    using Call = typename Curry::Call<Equals>::Call<int>::Call<T>::Call;
+    using Call = typename Curry::Call<Equals>::Call<Int<0>>::Call<T>::Call;
 };
 
 #endif

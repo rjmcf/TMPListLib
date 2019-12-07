@@ -47,9 +47,9 @@ void test_functions()
     static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Call::Value,
         "Testing that curry with all arguments supplied returns the correct result (false)");
 
-    // Test IsInt (a curried Equals<int> function)
-    static_assert(IsInt::Call<int>::Value,
-        "Testing that is_int correctly returns true");
-    static_assert(!IsInt::Call<bool>::Value,
-        "Testing that is_int correctly returns false");
+    // Test IsZero (a curried Equals<Int<0>> function)
+    static_assert(IsZero::Call<Int<0>>::Value,
+        "Testing that IsZero correctly returns true");
+    static_assert(!IsZero::Call<Int<1>>::Value,
+        "Testing that IsZero correctly returns false");
 }
