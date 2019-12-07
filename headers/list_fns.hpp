@@ -83,7 +83,7 @@ class Fill
     {
         using Type = void;
     };
-    
+
 public:
     template <typename N, typename T>
     using Call = fill<N, T>;
@@ -275,6 +275,36 @@ class Flatten
 public:
     template <typename TList>
     using Call = flatten<TList>;
+};
+
+/*
+ * Zip Apply.
+ * Takes a list of single arg functions and a list of arguments
+ * returns a list where the ith element is the ith function
+ * applied to the ith argument
+ */
+class ZipApply
+{
+    template <typename Fs, typename Args, typename>
+    struct ZipAppImpl;
+    template <typename Fs, typename Args, typename Extra = void>
+    using zip_app = typename ZipAppImpl<Fs, Args, Extra>::Type;
+
+    template <typename FHead, typename FTail, typename AHead, typename ATail, typename Extra>
+    struct ZipAppImpl<List<FHead, FTail>, List<AHead, ATail>, Extra>
+    {
+        using Type = List<call<FHead, AHead>, zip_app<FTail, ATail>>;
+    };
+
+    template <typename Extra>
+    struct ZipAppImpl<void, void, Extra>
+    {
+        using Type = void;
+    };
+
+public:
+    template <typename Fs, typename Args>
+    using Call = zip_app<Fs, Args>;
 };
 
 #endif

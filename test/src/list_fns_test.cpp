@@ -144,4 +144,11 @@ void test_list_fns()
             make_t<int, float, int, float, double>
         >(),
         "Testing flatten on a 3D list");
+
+    // Testing ZipApply
+    static_assert(std::is_same<
+        ZipApply::Call< make_t<IsZero, IsZero, Factorial>, make_t<Int<0>, Int<1>, Int<3>> >,
+        make_t<Bool<true>, Bool<false>, Int<6>>
+    >(),
+    "Testing Zip Apply");
 }
