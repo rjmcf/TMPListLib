@@ -20,13 +20,6 @@ struct Bool : public Val<bool, B>
 {};
 
 /*
- * Int Values
- */
-template <int I>
-struct Int : public Val<int, I>
-{};
-
-/*
  * Function semantics
  * Functions are first order, they can be used as values.
  *      they take their parameters as template arguments to the ::Call member template
@@ -111,12 +104,46 @@ public:
 };
 
 /*
+ * Int Values
+ */
+template <int I>
+struct Int : public Val<int, I>
+{};
+
+/*
  * Test curried function, returns Bool<true> if passed Int<0>
  */
 struct IsZero
 {
     template <typename T>
     using Call = typename Curry::Call<Equals>::Call<Int<0>>::Call<T>::Call;
+};
+
+/*
+ * Factorial
+ */
+class Factorial
+{
+    template <typename N, typename>
+    struct FactImpl;
+    template <typename N, typename Extra = void>
+    using fact = typename FactImpl<N, Extra>::Type;
+
+    template <int N, typename Extra>
+    struct FactImpl<Int<N>, Extra>
+    {
+        using Type = Int<N * fact<Int<N-1>>::Value>;
+    };
+
+    template<typename Extra>
+    struct FactImpl<Int<0>, Extra>
+    {
+        using Type = Int<1>;
+    };
+
+public:
+    template <typename N>
+    using Call = fact<N>;
 };
 
 #endif

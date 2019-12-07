@@ -52,4 +52,8 @@ void test_functions()
         "Testing that IsZero correctly returns true");
     static_assert(!IsZero::Call<Int<1>>::Value,
         "Testing that IsZero correctly returns false");
+
+    // Test Factorial
+    static_assert(Factorial::Call<Int<4>>::Value == 24,
+        "Testing factorial");
 }
