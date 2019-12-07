@@ -45,6 +45,13 @@ void test_list_fns()
     static_assert(IsList::Call<List<bool, void>>::Value,
         "Testing that is_list returns true for a non-empty list");
 
+    // Test length
+    static_assert(Length::Call<void>::Value == 0,
+        "Testing length for an empty list");
+    static_assert(Length::Call<make_t<int>>::Value == 1,
+        "Testing length for a single item list");
+    static_assert(Length::Call<make_t<int, float, double>>::Value == 3,
+        "Testing length for a longer list");
     // Test append
     static_assert(std::is_same<Append::Call<int, void>, make_t<int>>(),
         "Testing append on empty list");

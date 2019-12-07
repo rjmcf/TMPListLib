@@ -36,6 +36,33 @@ public:
 };
 
 /*
+ * Length
+ */
+class Length
+{
+    template <typename TList, typename>
+    struct LengthImpl;
+    template <typename TList, typename Extra = void>
+    using length = typename LengthImpl<TList, Extra>::Type;
+
+    template <typename THead, typename TTail, typename Extra>
+    struct LengthImpl<List<THead, TTail>, Extra>
+    {
+        using Type = Int<1 + length<TTail>::Value>;
+    };
+
+    template<typename Extra>
+    struct LengthImpl<void, Extra>
+    {
+        using Type = Int<0>;
+    };
+
+public:
+    template <typename TList>
+    using Call = length<TList>;
+};
+
+/*
  * Append to a list
  */
 class Append

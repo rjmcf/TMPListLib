@@ -20,13 +20,18 @@ struct Bool : public Val<bool, B>
 {};
 
 /*
+ * Int Values
+ */
+template <int I>
+struct Int : public Val<int, I>
+{};
+
+/*
  * Function semantics
- * Simple Functions take their parameters as template arguments
- *      to get the result (usually a Value), use ::Type
- * F Functions are higher order, they can be used as values.
+ * Functions are first order, they can be used as values.
  *      they take their parameters as template arguments to the ::Call member template
  *      to get the result, use ::Call<Args...>
- * the "call" helper allows for easier use of F Functions. It enables obtaining a result
+ * the "call" helper allows for easier use of Functions. It enables obtaining a result
  *      by using call<F, Args...>
  */
  template<typename F, typename... Args>
