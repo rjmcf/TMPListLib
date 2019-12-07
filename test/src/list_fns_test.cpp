@@ -34,7 +34,7 @@ void test_list_fns()
             call< call< Curry::Call<Equals>, int>, int>
         >(),
         "Test that the head of a list of curried functions can be called mutliple times");
-    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Call::Value,
+    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Result::Value,
         "Test that the head of a list of curried functions can be called mutliple times and return a value");
 
     // Test is_list
@@ -146,6 +146,8 @@ void test_list_fns()
         "Testing flatten on a 3D list");
 
     // Testing ZipApply
+    static_assert(std::is_same<ZipApply::Call<void, void>, void>(),
+        "Testing ZipApply on empty lists");
     static_assert(std::is_same<
         ZipApply::Call< make_t<IsZero, IsZero, Factorial>, make_t<Int<0>, Int<1>, Int<3>> >,
         make_t<Bool<true>, Bool<false>, Int<6>>

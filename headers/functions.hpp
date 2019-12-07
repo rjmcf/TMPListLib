@@ -88,7 +88,7 @@ private:
     template <typename F, typename... AllArgs>
     struct CurryImpl<Bool<true>, F, AllArgs...>
     {
-        using Call = call<F, AllArgs...>;
+        using Result = call<F, AllArgs...>;
     };
 
     template <typename F, typename... ArgsSoFar>
@@ -116,7 +116,7 @@ struct Int : public Val<int, I>
 struct IsZero
 {
     template <typename T>
-    using Call = typename Curry::Call<Equals>::Call<Int<0>>::Call<T>::Call;
+    using Call = typename Curry::Call<Equals>::Call<Int<0>>::Call<T>::Result;
 };
 
 /*

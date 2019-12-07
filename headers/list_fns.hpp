@@ -327,27 +327,16 @@ class MapN
         using Type = mapN<F, ZipApply::Call<Acc, TFirst>, TRest...>;
     };
 
-    template <typename Acc, typename>
-    struct FinalApply;
-    template <typename Acc, typename Extra = void>
-    using final_app = typename FinalApply<Acc, Extra>::Type;
-
-    template <typename THead, typename TTail, typename Extra>
-    struct FinalApply<List<THead, TTail>, Extra>
+    struct FinalApply
     {
-        using Type = List<typename THead::Call, final_app<TTail>>;
-    };
-
-    template <typename Extra>
-    struct FinalApply<void, Extra>
-    {
-        using Type = void;
+        template <typename F>
+        using Call = typename F::Result;
     };
 
     template <typename F, typename Acc>
     struct MapNImpl<F, Acc>
     {
-        using Type = final_app<Acc>;
+        using Type = Map::Call<FinalApply, Acc>;
     };
 
     // If given empty lists
