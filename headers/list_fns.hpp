@@ -179,44 +179,48 @@ public:
 /*
  * Flatten function
  */
-template <typename TList>
-struct Flatten;
-template <typename TList>
-using flatten = typename Flatten<TList>::Type;
-
-template<typename IsList, typename TList>
-struct FlattenImpl;
-template<typename IsList, typename TList>
-using flatten_impl = typename FlattenImpl<IsList, TList>::Type;
-
-template<typename THead, typename TTail>
-struct FlattenImpl<Bool<true>, List<THead, TTail>>
+struct Flatten
 {
-    using Type = Concat::Call<flatten<THead>, flatten<TTail>>;
-};
+    template <typename TList, typename>
+    struct FlattenImpl;
+    template <typename TList, typename Extra = void>
+    using flatten = typename FlattenImpl<TList, Extra>::Type;
 
-template<typename THead, typename TTail>
-struct FlattenImpl<Bool<false>, List<THead, TTail>>
-{
-    using Type = List<THead, flatten<TTail>>;
-};
+    // Need separate FlattenSelect partial specs, since
+    // some types would be invalid if written as single
+    // Select statement
+    template<typename IsList, typename TList>
+    struct FlattenSelect;
+    template<typename IsList, typename TList>
+    using flatten_s = typename FlattenSelect<IsList, TList>::Type;
 
-template<typename THead, typename TTail>
-struct Flatten< List<THead, TTail> >
-{
-    using Type = flatten_impl<IsList::Call<THead>, List<THead, TTail>>;
-};
+    template<typename THead, typename TTail>
+    struct FlattenSelect<Bool<true>, List<THead, TTail>>
+    {
+        using Type = Concat::Call<flatten<THead>, flatten<TTail>>;
+    };
 
-template<>
-struct Flatten<void>
-{
-    using Type = void;
-};
+    template<typename THead, typename TTail>
+    struct FlattenSelect<Bool<false>, List<THead, TTail>>
+    {
+        using Type = List<THead, flatten<TTail>>;
+    };
 
-struct FlattenF
-{
+    template<typename THead, typename TTail, typename Extra>
+    struct FlattenImpl< List<THead, TTail>, Extra >
+    {
+        using Type = flatten_s<IsList::Call<THead>, List<THead, TTail>>;
+    };
+
+    template<typename Extra>
+    struct FlattenImpl<void, Extra>
+    {
+        using Type = void;
+    };
+
+public:
     template <typename TList>
-    using Call = call<TList>;
+    using Call = flatten<TList>;
 };
 
 #endif
