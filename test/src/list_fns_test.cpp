@@ -12,9 +12,9 @@ void test_list_fns()
         "Testing that Lists can store Vals in their tails");
 
     // Test lists of functions
-    static_assert(std::is_same<make_t<IsIntF>, List<IsIntF, void> >(),
+    static_assert(std::is_same<make_t<IsInt>, List<IsInt, void> >(),
         "Test that make_t applies to functions too");
-    static_assert(call<head<make_t<IsIntF>>, int>::Value,
+    static_assert(call<head<make_t<IsInt>>, int>::Value,
         "Test that the head of a list of functions can be called");
     static_assert(std::is_same<make_t<Curry>, List<Curry, void> >(),
         "Test that make_t applies to the Curry function");
@@ -34,7 +34,7 @@ void test_list_fns()
             call< call< Curry::Call<Equals>, int>, int>
         >(),
         "Test that the head of a list of curried functions can be called mutliple times");
-    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Type::Value,
+    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Call::Value,
         "Test that the head of a list of curried functions can be called mutliple times and return a value");
 
     // Test is_list
@@ -74,21 +74,21 @@ void test_list_fns()
         "Testing concat on two larger lists");
 
     // Test filter
-    static_assert(std::is_same<Filter::Call<IsIntF, void>, void>(),
+    static_assert(std::is_same<Filter::Call<IsInt, void>, void>(),
         "Testing filter_impl applied to an empty list");
     static_assert(
         std::is_same<
-            Filter::Call<IsIntF, make_t<int, float, char, int, double>>,
+            Filter::Call<IsInt, make_t<int, float, char, int, double>>,
             make_t<int, int>
         >(),
         "Testing applied to a longer list");
 
     // Test map
-    static_assert(std::is_same<Map::Call<IsIntF, void>, void>(),
+    static_assert(std::is_same<Map::Call<IsInt, void>, void>(),
         "Testing map on empty list");
     static_assert(
         std::is_same<
-            Map::Call<IsIntF, make_t<int, char, float, int, double>>,
+            Map::Call<IsInt, make_t<int, char, float, int, double>>,
             make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
         >(),
         "Testing map on IsInt and a larger list");

@@ -71,41 +71,36 @@ public:
 };
 
 /*
- * Currying a function
- * This doesn't meld well with the current function semantics.
- * Given a curried function CF, implicitly an F Function, call<CF, Args...>
- * returns another F Function when Args... does not contain all the required arguments,
- * and a Simple Function when it does. This is inconsistent with normal F Functions,
- * since a curried function called with "call" requires an extra ::Type to get the value
- * Because we need to use sfinae to select the correct result when the function call is valid,
- * I don't think we can get rid of this extra Type call. Therefor instead I should
- * make *all* F Functions require the extra Type, after Call. Then all function usage
- * is consistent.
+ * Curry
+ * At the moment, requires a final Call after all arguments supplied
  */
-template <typename F, typename... Args, typename CheckIfValid = call<F, Args...>>
-constexpr Bool<true> is_valid_call(std::nullptr_t);
-
-template <typename F, typename... Args>
-constexpr Bool<false> is_valid_call(...);
-
-template <typename IsValid, typename F, typename... ArgsSoFar>
-struct CurryImpl;
-
-template <typename F, typename... AllArgs>
-struct CurryImpl<Bool<true>, F, AllArgs...>
+class Curry
 {
-    using Type = call<F, AllArgs...>;
-};
+public:
+    template <typename F, typename... Args, typename CheckIfValid = call<F, Args...>>
+    static constexpr Bool<true> is_valid_call(std::nullptr_t);
 
-template <typename F, typename... ArgsSoFar>
-struct CurryImpl<Bool<false>, F, ArgsSoFar...>
-{
-    template <typename... ArgsToCome>
-    using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar..., ArgsToCome...>(nullptr)), F, ArgsSoFar..., ArgsToCome...>;
-};
+    template <typename F, typename... Args>
+    static constexpr Bool<false> is_valid_call(...);
 
-struct Curry
-{
+private:
+    template <typename IsValid, typename F, typename... ArgsSoFar>
+    struct CurryImpl;
+
+    template <typename F, typename... AllArgs>
+    struct CurryImpl<Bool<true>, F, AllArgs...>
+    {
+        using Call = call<F, AllArgs...>;
+    };
+
+    template <typename F, typename... ArgsSoFar>
+    struct CurryImpl<Bool<false>, F, ArgsSoFar...>
+    {
+        template <typename... ArgsToCome>
+        using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar..., ArgsToCome...>(nullptr)), F, ArgsSoFar..., ArgsToCome...>;
+    };
+
+public:
     template <typename F, typename... ArgsToCome>
     using Call = CurryImpl<decltype(is_valid_call<F, ArgsToCome...>(nullptr)), F, ArgsToCome...>;
 };
@@ -113,16 +108,10 @@ struct Curry
 /*
  * Test curried function, returns Bool<true> if passed int
  */
-template <typename T>
 struct IsInt
 {
-    using Type = typename Curry::Call<Equals>::Call<int>::Call<T>::Type;
-};
-
-struct IsIntF
-{
     template <typename T>
-    using Call = typename IsInt<T>::Type;
+    using Call = typename Curry::Call<Equals>::Call<int>::Call<T>::Call;
 };
 
 #endif

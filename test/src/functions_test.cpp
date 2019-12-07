@@ -42,14 +42,14 @@ void test_functions()
         "Testing that call<Select, false> correctly selects the second value");
 
     // Test Curry
-    static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Type::Value,
+    static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Call::Value,
         "Testing that curry with all arguments supplied returns the correct result (true)");
-    static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Type::Value,
+    static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Call::Value,
         "Testing that curry with all arguments supplied returns the correct result (false)");
 
     // Test IsInt (a curried Equals<int> function)
-    static_assert(IsInt<int>::Type::Value,
+    static_assert(IsInt::Call<int>::Value,
         "Testing that is_int correctly returns true");
-    static_assert(!IsInt<bool>::Type::Value,
+    static_assert(!IsInt::Call<bool>::Value,
         "Testing that is_int correctly returns false");
 }
