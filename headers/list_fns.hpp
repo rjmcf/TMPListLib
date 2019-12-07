@@ -63,6 +63,33 @@ public:
 };
 
 /*
+ * Fill, used to generate a list of N of the same element
+ */
+class Fill
+{
+    template <typename N, typename T>
+    struct FillImpl;
+    template <typename N, typename T>
+    using fill = typename FillImpl<N,T>::Type;
+
+    template <int N, typename T>
+    struct FillImpl<Int<N>, T>
+    {
+        using Type = List<T, fill<Int<N-1>,T>>;
+    };
+
+    template <typename T>
+    struct FillImpl<Int<0>, T>
+    {
+        using Type = void;
+    };
+    
+public:
+    template <typename N, typename T>
+    using Call = fill<N, T>;
+};
+
+/*
  * Append to a list
  */
 class Append
