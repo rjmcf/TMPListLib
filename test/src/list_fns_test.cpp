@@ -105,7 +105,7 @@ void test_list_fns()
             Map::Call<IsZero, make_t<Int<0>, char, float, Int<0>, double>>,
             make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
         >(),
-        "Testing map on IsInt and a larger list");
+        "Testing map on IsZero and a larger list");
 
     // Test zip
     static_assert(std::is_same<Zip::Call<void,void>, void>(),
@@ -151,4 +151,29 @@ void test_list_fns()
         make_t<Bool<true>, Bool<false>, Int<6>>
     >(),
     "Testing Zip Apply");
+
+    // Test MapN
+    static_assert(std::is_same<MapN::Call<IsZero, void>, void>(),
+        "Testing mapN on empty list");
+    static_assert(std::is_same<MapN::Call<Equals, void, void>, void>(),
+        "Testing mapN on empty lists");
+    static_assert(
+        std::is_same<
+            MapN::Call<IsZero, make_t<Int<0>, char>>,
+            make_t<Bool<true>, Bool<false>>
+        >(),
+        "Testing map on single argument function IsZero");
+    static_assert(
+        std::is_same<
+            MapN::Call<Equals, make_t<int, float>, make_t<int, int>>,
+            make_t<Bool<true>, Bool<false>>
+        >(),
+        "Testing MapN on two argument function Equals");
+    static_assert(
+        std::is_same<
+            MapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<int, float>>,
+            make_t<int, float>
+        >(),
+        "Testing MapN on three argument function Select");
+
 }

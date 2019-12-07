@@ -307,4 +307,65 @@ public:
     using Call = zip_app<Fs, Args>;
 };
 
+/*
+ * MapN
+ * Takes a function of N arguments, and N lists of length M
+ * Produces a single list of length M whose ith element is the
+ * result of applying the function to all the ith elements of
+ * the N lists.
+ */
+class MapN
+{
+    template <typename F, typename Acc, typename... TLists>
+    struct MapNImpl;
+    template <typename F, typename Acc, typename... TLists>
+    using mapN = typename MapNImpl<F, Acc, TLists...>::Type;
+
+    template <typename F, typename Acc, typename TFirst, typename... TRest>
+    struct MapNImpl<F, Acc, TFirst, TRest...>
+    {
+        using Type = mapN<F, ZipApply::Call<Acc, TFirst>, TRest...>;
+    };
+
+    template <typename Acc, typename>
+    struct FinalApply;
+    template <typename Acc, typename Extra = void>
+    using final_app = typename FinalApply<Acc, Extra>::Type;
+
+    template <typename THead, typename TTail, typename Extra>
+    struct FinalApply<List<THead, TTail>, Extra>
+    {
+        using Type = List<typename THead::Call, final_app<TTail>>;
+    };
+
+    template <typename Extra>
+    struct FinalApply<void, Extra>
+    {
+        using Type = void;
+    };
+
+    template <typename F, typename Acc>
+    struct MapNImpl<F, Acc>
+    {
+        using Type = final_app<Acc>;
+    };
+
+    // If given empty lists
+    template <typename F, typename... Empties>
+    struct MapNImpl<F, void, void, Empties...>
+    {
+        using Type = void;
+    };
+
+    template <typename F, typename TFirst, typename... TRest>
+    struct MapNImpl<F, void, TFirst, TRest...>
+    {
+        using Type = mapN<F, Fill::Call<Length::Call<TFirst>, Curry::Call<F>>, TFirst, TRest...>;
+    };
+
+public:
+    template <typename F, typename... TLists>
+    using Call = mapN<F, void, TLists...>;
+};
+
 #endif
