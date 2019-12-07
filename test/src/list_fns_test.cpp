@@ -165,8 +165,8 @@ void test_list_fns()
         "Testing map on single argument function IsZero");
     static_assert(
         std::is_same<
-            MapN::Call<Equals, make_t<int, float>, make_t<int, int>>,
-            make_t<Bool<true>, Bool<false>>
+            MapN::Call<Equals, make_t<int, float, Int<0>>, make_t<int, int, Int<0>> >,
+            make_t<Bool<true>, Bool<false>, Bool<true>>
         >(),
         "Testing MapN on two argument function Equals");
     static_assert(
