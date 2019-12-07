@@ -35,44 +35,39 @@ struct Bool : public Val<bool, B>
 /*
  * Test function, returns Bool<true> if passed the same type twice.
  */
-template<typename T, typename U>
-struct Equals
+class Equals
 {
-    using Type = Bool<std::is_same<T, U>::value>;
-};
-template<typename T, typename U>
-using equals = typename Equals<T, U>::Type;
-
-struct EqualsF
-{
+public:
     template<typename T, typename U>
-    using Call = equals<T, U>;
+    using Call = Bool<std::is_same<T, U>::value>;
 };
 
 /*
  * Select from two values based on condition
  */
-template <typename TakeFirst, typename TFirst, typename TSecond>
-struct Select;
-template <typename TakeFirst, typename TFirst, typename TSecond>
-using select_t = typename Select<TakeFirst, TFirst, TSecond>::Type;
-
-template <typename TFirst, typename TSecond>
-struct Select<Bool<true>, TFirst, TSecond>
-{
-    using Type = TFirst;
-};
-
-template <typename TFirst, typename TSecond>
-struct Select<Bool<false>, TFirst, TSecond>
-{
-    using Type = TSecond;
-};
-
-struct SelectF
+class Select
 {
     template <typename TakeFirst, typename TFirst, typename TSecond>
-    using Call = select_t<TakeFirst, TFirst, TSecond>;
+    struct SelectImpl;
+
+    template <typename TakeFirst, typename TFirst, typename TSecond>
+    using select = typename SelectImpl<TakeFirst, TFirst, TSecond>::Type;
+
+    template <typename TFirst, typename TSecond>
+    struct SelectImpl<Bool<true>, TFirst, TSecond>
+    {
+        using Type = TFirst;
+    };
+
+    template <typename TFirst, typename TSecond>
+    struct SelectImpl<Bool<false>, TFirst, TSecond>
+    {
+        using Type = TSecond;
+    };
+
+public:
+    template <typename TakeFirst, typename TFirst, typename TSecond>
+    using Call = select<TakeFirst, TFirst, TSecond>;
 };
 
 /*
@@ -109,10 +104,9 @@ struct CurryImpl<Bool<false>, F, ArgsSoFar...>
     using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar..., ArgsToCome...>(nullptr)), F, ArgsSoFar..., ArgsToCome...>;
 };
 
-template <typename F>
 struct Curry
 {
-    template <typename... ArgsToCome>
+    template <typename F, typename... ArgsToCome>
     using Call = CurryImpl<decltype(is_valid_call<F, ArgsToCome...>(nullptr)), F, ArgsToCome...>;
 };
 
@@ -122,7 +116,7 @@ struct Curry
 template <typename T>
 struct IsInt
 {
-    using Type = typename Curry<EqualsF>::Call<int>::Call<T>::Type;
+    using Type = typename Curry::Call<Equals>::Call<int>::Call<T>::Type;
 };
 
 struct IsIntF

@@ -7,28 +7,30 @@
 /*
  * IsList function
  */
-template <typename T>
-struct IsList
+class IsList
 {
-    using Type = Bool<false>;
-};
-template <typename T>
-using is_list = typename IsList<T>::Type;
+    template <typename T, typename>
+    struct IsListImpl
+    {
+        using Type = Bool<false>;
+    };
 
-template <typename THead, typename TTail>
-struct IsList<List<THead, TTail>>
-{
-    using Type = Bool<true>;
-};
+    template <typename T, typename Extra = void>
+    using is_list = typename IsListImpl<T, Extra>::Type;
 
-template <>
-struct IsList<void>
-{
-    using Type = Bool<true>;
-};
+    template <typename THead, typename TTail, typename Extra>
+    struct IsListImpl<List<THead, TTail>, Extra>
+    {
+        using Type = Bool<true>;
+    };
 
-struct IsListF
-{
+    template <typename Extra>
+    struct IsListImpl<void, Extra>
+    {
+        using Type = Bool<true>;
+    };
+
+public:
     template <typename T>
     using Call = is_list<T>;
 };
@@ -36,25 +38,27 @@ struct IsListF
 /*
  * Append to a list
  */
-template <typename T, typename TList>
-struct Append;
-template <typename T, typename TList>
-using append = typename Append<T, TList>::Type;
-
-template <typename T, typename THead, typename TTail>
-struct Append<T, List<THead, TTail>>
+class Append
 {
-    using Type = List<THead, append<T, TTail>>;
-};
+    template <typename T, typename TList>
+    struct AppendImpl;
 
-template <typename T>
-struct Append<T, void>
-{
-    using Type = List<T, void>;
-};
+    template <typename T, typename TList>
+    using append = typename AppendImpl<T,TList>::Type;
 
-struct AppendF
-{
+    template <typename T, typename THead, typename TTail>
+    struct AppendImpl<T, List<THead, TTail>>
+    {
+        using Type = List<THead, typename AppendImpl<T, TTail>::Type>;
+    };
+
+    template <typename T>
+    struct AppendImpl<T, void>
+    {
+        using Type = List<T, void>;
+    };
+
+public:
     template <typename T, typename TList>
     using Call = append<T, TList>;
 };
@@ -62,112 +66,58 @@ struct AppendF
 /*
  * Concatenate two lists
  */
-template <typename TList1, typename TList2>
-struct Concat;
-template <typename TList1, typename TList2>
-using concat = typename Concat<TList1, TList2>::Type;
-
-template <typename THead, typename TTail, typename TList2>
-struct Concat<List<THead, TTail>, TList2>
+class Concat
 {
-    using Type = List<THead, concat<TTail, TList2>>;
-};
+    template <typename TList1, typename TList2>
+    struct ConcatImpl;
 
-template <typename TList2>
-struct Concat<void, TList2>
-{
-    using Type = TList2;
-};
+    template <typename TList1, typename TList2>
+    using concat = typename ConcatImpl<TList1, TList2>::Type;
 
-struct ConcatF
-{
+    template <typename THead, typename TTail, typename TList2>
+    struct ConcatImpl<List<THead, TTail>, TList2>
+    {
+        using Type = List<THead, typename ConcatImpl<TTail, TList2>::Type>;
+    };
+
+    template <typename TList2>
+    struct ConcatImpl<void, TList2>
+    {
+        using Type = TList2;
+    };
+
+public:
     template <typename TList1, typename TList2>
     using Call = concat<TList1, TList2>;
 };
 
 /*
- * Mutual Recursive Filter
+ * Filter
  */
-template <typename ShouldInclude, typename FilterF, typename TList>
-struct FilterMR_Impl;
-template <typename ShouldInclude, typename FilterF, typename TList>
-using filter_mr_impl = typename FilterMR_Impl<ShouldInclude, FilterF, TList>::Type;
-
-template <typename FilterF, typename TList>
-struct FilterMR;
-template <typename FilterF, typename TList>
-using filter_mr = typename FilterMR<FilterF, TList>::Type;
-
-template <typename FilterF, typename THead, typename TTail>
-struct FilterMR_Impl<Bool<true>, FilterF, List<THead, TTail>>
-{
-    using Type = List<THead, filter_mr<FilterF, TTail>>;
-};
-
-template <typename FilterF, typename THead, typename TTail>
-struct FilterMR_Impl<Bool<false>, FilterF, List<THead, TTail>>
-{
-    using Type = filter_mr<FilterF, TTail>;
-};
-
-template <typename FilterF, typename TList>
-struct FilterMR
-{
-    using Type = filter_mr_impl<call<FilterF, head<TList>>, FilterF, TList>;
-};
-
-template <typename FilterF>
-struct FilterMR<FilterF, void>
-{
-    using Type = void;
-};
-
-struct FilterMR_F
-{
-    template <typename FilterF, typename TList>
-    using Call = filter_mr<FilterF, TList>;
-};
-
-/*
- * Simply Recursive Filter
- */
-template<typename FilterF, typename TList>
-struct FilterSR;
-template<typename FilterF, typename TList>
-using filter_sr = typename FilterSR<FilterF, TList>::Type;
-
-template<typename FilterF, typename THead, typename TTail>
-struct FilterSR<FilterF, List<THead, TTail>>
-{
-    using Type = select_t<
-/*If*/   call<FilterF,THead>,
-/*Then*/ List<THead, filter_sr<FilterF,TTail>>,
-/*Else*/ filter_sr<FilterF,TTail>
-    >;
-};
-
-template<typename FilterF>
-struct FilterSR<FilterF, void>
-{
-    using Type = void;
-};
-
-struct FilterSR_F
+class Filter
 {
     template<typename FilterF, typename TList>
-    using Call = filter_sr<FilterF, TList>;
-};
+    struct FilterImpl;
+    template<typename FilterF, typename TList>
+    using filter = typename FilterImpl<FilterF, TList>::Type;
 
-/*
- * Choosing default Filter
- */
-template<typename FilterF, typename TList>
-using Filter = FilterSR<FilterF, TList>;
-template<typename FilterF, typename TList>
-using filter = typename Filter<FilterF, TList>::Type;
+    template<typename FilterF, typename THead, typename TTail>
+    struct FilterImpl<FilterF, List<THead, TTail>>
+    {
+        using Type = Select::Call<
+    /*If*/   call<FilterF,THead>,
+    /*Then*/ List<THead, filter<FilterF,TTail>>,
+    /*Else*/ filter<FilterF,TTail>
+        >;
+    };
 
-struct FilterF
-{
+    template<typename FilterF>
+    struct FilterImpl<FilterF, void>
+    {
+        using Type = void;
+    };
+
+public:
     template<typename FilterF, typename TList>
     using Call = filter<FilterF, TList>;
 };
@@ -175,25 +125,26 @@ struct FilterF
 /*
  * Map function
  */
-template <typename F, typename TList>
-struct Map;
-template <typename F, typename TList>
-using map = typename Map<F, TList>::Type;
-
-template <typename F, typename THead, typename TTail>
-struct Map<F, List<THead, TTail>>
+class Map
 {
-    using Type = List<call<F, THead>, map<F, TTail>>;
-};
+    template <typename F, typename TList>
+    struct MapImpl;
+    template <typename F, typename TList>
+    using map = typename MapImpl<F, TList>::Type;
 
-template <typename F>
-struct Map<F, void>
-{
-    using Type = void;
-};
+    template <typename F, typename THead, typename TTail>
+    struct MapImpl<F, List<THead, TTail>>
+    {
+        using Type = List<call<F, THead>, map<F, TTail>>;
+    };
 
-struct MapF
-{
+    template <typename F>
+    struct MapImpl<F, void>
+    {
+        using Type = void;
+    };
+
+public:
     template <typename F, typename TList>
     using Call = map<F, TList>;
 };
@@ -201,25 +152,26 @@ struct MapF
 /*
  * Zip function
  */
-template <typename TList1, typename TList2>
-struct Zip;
-template <typename TList1, typename TList2>
-using zip = typename Zip<TList1, TList2>::Type;
-
-template <typename THead1, typename TTail1, typename THead2, typename TTail2>
-struct Zip<List<THead1, TTail1>, List<THead2, TTail2>>
+class Zip
 {
-    using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2>>;
-};
+    template <typename TList1, typename TList2, typename>
+    struct ZipImpl;
+    template <typename TList1, typename TList2, typename Extra = void>
+    using zip = typename ZipImpl<TList1, TList2, Extra>::Type;
 
-template<>
-struct Zip<void, void>
-{
-    using Type = void;
-};
+    template <typename THead1, typename TTail1, typename THead2, typename TTail2, typename Extra>
+    struct ZipImpl<List<THead1, TTail1>, List<THead2, TTail2>, Extra>
+    {
+        using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2, Extra>>;
+    };
 
-struct ZipF
-{
+    template<typename Extra>
+    struct ZipImpl<void, void, Extra>
+    {
+        using Type = void;
+    };
+
+public:
     template <typename TList1, typename TList2>
     using Call = zip<TList1, TList2>;
 };
@@ -240,7 +192,7 @@ using flatten_impl = typename FlattenImpl<IsList, TList>::Type;
 template<typename THead, typename TTail>
 struct FlattenImpl<Bool<true>, List<THead, TTail>>
 {
-    using Type = concat<flatten<THead>, flatten<TTail>>;
+    using Type = Concat::Call<flatten<THead>, flatten<TTail>>;
 };
 
 template<typename THead, typename TTail>
@@ -252,7 +204,7 @@ struct FlattenImpl<Bool<false>, List<THead, TTail>>
 template<typename THead, typename TTail>
 struct Flatten< List<THead, TTail> >
 {
-    using Type = flatten_impl<is_list<THead>, List<THead, TTail>>;
+    using Type = flatten_impl<IsList::Call<THead>, List<THead, TTail>>;
 };
 
 template<>

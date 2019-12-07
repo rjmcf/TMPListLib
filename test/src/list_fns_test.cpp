@@ -3,19 +3,6 @@
 #include "list_fns.hpp"
 #include "list_fns_test.hpp"
 
-template <template <typename FilterF, typename TList> class FilterImpl>
-constexpr void test_filter()
-{
-    static_assert(std::is_same<FilterImpl<IsIntF, void>, void>(),
-        "Testing filter_impl applied to an empty list");
-    static_assert(
-        std::is_same<
-            FilterImpl<IsIntF, make_t<int, float, char, int, double>>,
-            make_t<int, int>
-        >(),
-        "Testing applied to a longer list");
-}
-
 void test_list_fns()
 {
     // Test that lists can store value
@@ -29,93 +16,89 @@ void test_list_fns()
         "Test that make_t applies to functions too");
     static_assert(call<head<make_t<IsIntF>>, int>::Value,
         "Test that the head of a list of functions can be called");
+    static_assert(std::is_same<make_t<Curry>, List<Curry, void> >(),
+        "Test that make_t applies to the Curry function");
 
     // Test list of curried functions
-    static_assert(std::is_same<make_t<Curry<EqualsF>>, List<Curry<EqualsF>, void> >(),
+    static_assert(std::is_same<make_t<Curry::Call<Equals>>, List<Curry::Call<Equals>, void> >(),
         "Test that make_t applies to curried functions too");
     static_assert(
         std::is_same<
-            call< head< make_t<Curry<EqualsF>> >, int>,
-            call< Curry<EqualsF>, int>
+            call< head< make_t<Curry::Call<Equals>> >, int>,
+            call< Curry::Call<Equals>, int>
         >(),
         "Test that the head of a list of curried functions can be called");
     static_assert(
         std::is_same<
-            call< call< head< make_t<Curry<EqualsF>> >, int>, int>,
-            call< call< Curry<EqualsF>, int>, int>
+            call< call< head< make_t<Curry::Call<Equals>> >, int>, int>,
+            call< call< Curry::Call<Equals>, int>, int>
         >(),
         "Test that the head of a list of curried functions can be called mutliple times");
-    static_assert(call< call< head< make_t<Curry<EqualsF>> >, int>, int>::Type::Value,
+    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Type::Value,
         "Test that the head of a list of curried functions can be called mutliple times and return a value");
 
     // Test is_list
-    static_assert(!is_list<bool>::Value,
+    static_assert(!IsList::Call<bool>::Value,
         "Testing that is_list returns false correctly");
-    static_assert(is_list<void>::Value,
+    static_assert(IsList::Call<void>::Value,
         "Testing that is_list returns true for an empty list");
-    static_assert(is_list<List<bool, void>>::Value,
+    static_assert(IsList::Call<List<bool, void>>::Value,
         "Testing that is_list returns true for a non-empty list");
 
     // Test append
-    static_assert(std::is_same<append<int, void>, make_t<int>>(),
+    static_assert(std::is_same<Append::Call<int, void>, make_t<int>>(),
         "Testing append on empty list");
-    static_assert(std::is_same<append<float, make_t<int>>, make_t<int, float>>(),
+    static_assert(std::is_same<Append::Call<float, make_t<int>>, make_t<int, float>>(),
         "Testing append on small list");
     static_assert(
         std::is_same<
-            append<float, make_t<char, int> >,
+            Append::Call<float, make_t<char, int> >,
             make_t<char, int, float>
         >(),
         "Testing append on larger list");
-    static_assert(std::is_same<AppendF::Call<int, void>, append<int, void>>(),
-        "Testing that AppendF::Call works the same as append on an empty list");
-    static_assert(std::is_same<AppendF::Call<int, make_t<float>>, append<int, make_t<float>> >(),
-        "Testing that AppendF::Call works the same as append on a small list");
 
     // Test concat
-    static_assert(std::is_same<concat<void, void>, void>(),
+    static_assert(std::is_same<Concat::Call<void, void>, void>(),
         "Testing concat on two empty lists");
-    static_assert(std::is_same<concat<void, make_t<int>>, make_t<int> >(),
+    static_assert(std::is_same<Concat::Call<void, make_t<int>>, make_t<int> >(),
         "Testing concat when first list empty");
-    static_assert(std::is_same<concat<make_t<int>, void>, make_t<int> >(),
+    static_assert(std::is_same<Concat::Call<make_t<int>, void>, make_t<int> >(),
         "Testing concat when second list empty");
-    static_assert(std::is_same<concat<make_t<int>, make_t<float>>, make_t<int, float> >(),
+    static_assert(std::is_same<Concat::Call<make_t<int>, make_t<float>>, make_t<int, float> >(),
         "Testing concat on two small lists");
     static_assert(
         std::is_same<
-            concat< make_t<int, char>, make_t<float, double> >,
+            Concat::Call< make_t<int, char>, make_t<float, double> >,
             make_t<int, char, float, double>
         >(),
         "Testing concat on two larger lists");
+
+    // Test filter
+    static_assert(std::is_same<Filter::Call<IsIntF, void>, void>(),
+        "Testing filter_impl applied to an empty list");
     static_assert(
         std::is_same<
-            ConcatF::Call< make_t<int, char>, make_t<float, double> >,
-            concat< make_t<int, char>, make_t<float, double> >
+            Filter::Call<IsIntF, make_t<int, float, char, int, double>>,
+            make_t<int, int>
         >(),
-        "Testing ConcatF::Call works the same as concat");
-
-    // Test both filter impls
-    test_filter<filter_mr>();
-    test_filter<filter_sr>();
-    // Test default filter, whatever it's been selected as
-    test_filter<filter>();
+        "Testing applied to a longer list");
 
     // Test map
-    static_assert(std::is_same<map<IsIntF, void>, void>(),
+    static_assert(std::is_same<Map::Call<IsIntF, void>, void>(),
         "Testing map on empty list");
     static_assert(
         std::is_same<
-            map<IsIntF, make_t<int, char, float, int, double>>,
+            Map::Call<IsIntF, make_t<int, char, float, int, double>>,
             make_t<Bool<true>, Bool<false>, Bool<false>, Bool<true>, Bool<false>>
         >(),
         "Testing map on IsInt and a larger list");
 
     // Test zip
-    static_assert(std::is_same<zip<void,void>, void>(),
+    static_assert(std::is_same<Zip::Call<void,void>, void>(),
         "Testing zip on empty lists");
     static_assert(
         std::is_same<
-            zip<make_t<int, float, char>, make_t<int, char, double>>,
+            Zip::Call<make_t<int, float, char>, make_t<int, char, double>>,
             make_t<make_t<int,int>, make_t<float,char>, make_t<char,double>>
         >(),
         "Testing zip on larger lists");

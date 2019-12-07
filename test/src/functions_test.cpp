@@ -16,35 +16,35 @@ void test_functions()
         "Testing that Bool can store false");
 
     // Test equals
-    static_assert(equals<int, int>::Value,
+    static_assert(Equals::Call<int, int>::Value,
         "Testing that equals correctly returns true");
-    static_assert(!equals<int, float>::Value,
+    static_assert(!Equals::Call<int, float>::Value,
         "Testing that equals correctly returns false");
 
     // Test select_t
-    static_assert(std::is_same<select_t<Bool<true>, int, float>, int>(),
+    static_assert(std::is_same<Select::Call<Bool<true>, int, float>, int>(),
         "Testing that select correctly returns first");
-    static_assert(std::is_same<select_t<Bool<false>, int, float>, float>(),
+    static_assert(std::is_same<Select::Call<Bool<false>, int, float>, float>(),
         "Testing that select correctly returns second");
 
     // Test call
-    static_assert(EqualsF::Call<int, int>::Value,
-        "Testing that EqualsF(int, int) correctly returns true");
-    static_assert(call<EqualsF, int, int>::Value,
-        "Testing that call<EqualsF, int, int> correctly returns true");
-    static_assert(!EqualsF::Call<int, float>::Value,
-        "Testing that EqualsF(int, float) correctly returns false");
-    static_assert(!call<EqualsF, int, float>::Value,
-        "Testing that call<EqualsF, int, float> correctly returns false");
-    static_assert(std::is_same<call<SelectF, Bool<true>, int, float>, int>(),
-        "Testing that call<SelectF, true> correctly selects the first value");
-    static_assert(std::is_same<call<SelectF, Bool<false>, int, float>, float>(),
-        "Testing that call<SelectF, false> correctly selects the second value");
+    static_assert(Equals::Call<int, int>::Value,
+        "Testing that Equals(int, int) correctly returns true");
+    static_assert(call<Equals, int, int>::Value,
+        "Testing that call<Equals, int, int> correctly returns true");
+    static_assert(!Equals::Call<int, float>::Value,
+        "Testing that Equals(int, float) correctly returns false");
+    static_assert(!call<Equals, int, float>::Value,
+        "Testing that call<Equals, int, float> correctly returns false");
+    static_assert(std::is_same<call<Select, Bool<true>, int, float>, int>(),
+        "Testing that call<Select, true> correctly selects the first value");
+    static_assert(std::is_same<call<Select, Bool<false>, int, float>, float>(),
+        "Testing that call<Select, false> correctly selects the second value");
 
     // Test Curry
-    static_assert(Curry<EqualsF>::Call<int>::Call<int>::Type::Value,
+    static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Type::Value,
         "Testing that curry with all arguments supplied returns the correct result (true)");
-    static_assert(!Curry<EqualsF>::Call<int>::Call<float>::Type::Value,
+    static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Type::Value,
         "Testing that curry with all arguments supplied returns the correct result (false)");
 
     // Test IsInt (a curried Equals<int> function)
