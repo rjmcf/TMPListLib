@@ -179,7 +179,7 @@ public:
 /*
  * Flatten function
  */
-struct Flatten
+class Flatten
 {
     template <typename TList, typename>
     struct FlattenImpl;
