@@ -231,7 +231,7 @@ class Zip
     template <typename THead1, typename TTail1, typename THead2, typename TTail2, typename Extra>
     struct ZipImpl<List<THead1, TTail1>, List<THead2, TTail2>, Extra>
     {
-        using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2, Extra>>;
+        using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2>>;
     };
 
     template<typename Extra>
