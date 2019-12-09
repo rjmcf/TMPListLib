@@ -40,6 +40,9 @@ public:
     using Call = Bool<std::is_same<T, U>::value>;
 };
 
+template<typename T, typename U>
+using equals = call<Equals, T, U>;
+
 /*
  * Select from two values based on condition
  */
@@ -49,7 +52,7 @@ class Select
     struct SelectImpl;
 
     template <typename TakeFirst, typename TFirst, typename TSecond>
-    using select = typename SelectImpl<TakeFirst, TFirst, TSecond>::Type;
+    using selectImpl = typename SelectImpl<TakeFirst, TFirst, TSecond>::Type;
 
     template <typename TFirst, typename TSecond>
     struct SelectImpl<Bool<true>, TFirst, TSecond>
@@ -65,8 +68,11 @@ class Select
 
 public:
     template <typename TakeFirst, typename TFirst, typename TSecond>
-    using Call = select<TakeFirst, TFirst, TSecond>;
+    using Call = selectImpl<TakeFirst, TFirst, TSecond>;
 };
+
+template <typename TakeFirst, typename TFirst, typename TSecond>
+using select = call<Select, TakeFirst, TFirst, TSecond>;
 
 /*
  * Curry
@@ -99,9 +105,12 @@ private:
     };
 
 public:
-    template <typename F, typename... ArgsToCome>
-    using Call = CurryImpl<decltype(is_valid_call<F, ArgsToCome...>(nullptr)), F, ArgsToCome...>;
+    template <typename F, typename... ArgsSoFar>
+    using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar...>(nullptr)), F, ArgsSoFar...>;
 };
+
+template <typename F, typename... ArgsSoFar>
+using curry = call<Curry, F, ArgsSoFar...>;
 
 /*
  * Int Values
@@ -112,11 +121,14 @@ struct Int : public Val<int, I>
 
 /*
  * Test curried function, returns Bool<true> if passed Int<0>
+ * Ideally should just be able to write
+ * using IsZero = Curry::Call<Equals, Int<0>>
+ * but can't do that due to the final Result required
  */
 struct IsZero
 {
     template <typename T>
-    using Call = typename Curry::Call<Equals>::Call<Int<0>>::Call<T>::Result;
+    using Call = typename curry<Equals, Int<0>, T>::Result;
 };
 
 /*

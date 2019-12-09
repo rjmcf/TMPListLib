@@ -17,14 +17,22 @@ void test_functions()
 
     // Test equals
     static_assert(Equals::Call<int, int>::Value,
-        "Testing that equals correctly returns true");
+        "Testing that Equals correctly returns true");
     static_assert(!Equals::Call<int, float>::Value,
+        "Testing that Equals correctly returns false");
+    static_assert(equals<int, int>::Value,
+        "Testing that equals correctly returns true");
+    static_assert(!equals<int, float>::Value,
         "Testing that equals correctly returns false");
 
-    // Test select_t
+    // Test select
     static_assert(std::is_same<Select::Call<Bool<true>, int, float>, int>(),
-        "Testing that select correctly returns first");
+        "Testing that Select correctly returns first");
     static_assert(std::is_same<Select::Call<Bool<false>, int, float>, float>(),
+        "Testing that Select correctly returns second");
+    static_assert(std::is_same<select<Bool<true>, int, float>, int>(),
+        "Testing that select correctly returns first");
+    static_assert(std::is_same<select<Bool<false>, int, float>, float>(),
         "Testing that select correctly returns second");
 
     // Test call
@@ -43,9 +51,14 @@ void test_functions()
 
     // Test Curry
     static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Result::Value,
-        "Testing that curry with all arguments supplied returns the correct result (true)");
+        "Testing that Curry with all arguments supplied returns the correct result (true)");
     static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Result::Value,
+        "Testing that Curry with all arguments supplied returns the correct result (false)");
+    static_assert(curry<Equals>::Call<int>::Call<int>::Result::Value,
+        "Testing that curry with all arguments supplied returns the correct result (true)");
+    static_assert(!curry<Equals>::Call<int>::Call<float>::Result::Value,
         "Testing that curry with all arguments supplied returns the correct result (false)");
+    // @TODO add more tests of Curry
 
     // Test IsZero (a curried Equals<Int<0>> function)
     static_assert(IsZero::Call<Int<0>>::Value,

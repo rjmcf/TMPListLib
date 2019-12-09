@@ -16,7 +16,7 @@ class IsList
     };
 
     template <typename T, typename Extra = void>
-    using is_list = typename IsListImpl<T, Extra>::Type;
+    using is_listImpl = typename IsListImpl<T, Extra>::Type;
 
     template <typename THead, typename TTail, typename Extra>
     struct IsListImpl<List<THead, TTail>, Extra>
@@ -32,8 +32,11 @@ class IsList
 
 public:
     template <typename T>
-    using Call = is_list<T>;
+    using Call = is_listImpl<T>;
 };
+
+template <typename T>
+using is_list = call<IsList, T>;
 
 /*
  * Length
@@ -43,12 +46,12 @@ class Length
     template <typename TList, typename>
     struct LengthImpl;
     template <typename TList, typename Extra = void>
-    using length = typename LengthImpl<TList, Extra>::Type;
+    using lengthImpl = typename LengthImpl<TList, Extra>::Type;
 
     template <typename THead, typename TTail, typename Extra>
     struct LengthImpl<List<THead, TTail>, Extra>
     {
-        using Type = Int<1 + length<TTail>::Value>;
+        using Type = Int<1 + lengthImpl<TTail>::Value>;
     };
 
     template<typename Extra>
@@ -59,8 +62,11 @@ class Length
 
 public:
     template <typename TList>
-    using Call = length<TList>;
+    using Call = lengthImpl<TList>;
 };
+
+template <typename TList>
+using length = call<Length, TList>;
 
 /*
  * Fill, used to generate a list of N of the same element
@@ -70,12 +76,12 @@ class Fill
     template <typename N, typename T>
     struct FillImpl;
     template <typename N, typename T>
-    using fill = typename FillImpl<N,T>::Type;
+    using fillImpl = typename FillImpl<N,T>::Type;
 
     template <int N, typename T>
     struct FillImpl<Int<N>, T>
     {
-        using Type = List<T, fill<Int<N-1>,T>>;
+        using Type = List<T, fillImpl<Int<N-1>,T>>;
     };
 
     template <typename T>
@@ -86,8 +92,11 @@ class Fill
 
 public:
     template <typename N, typename T>
-    using Call = fill<N, T>;
+    using Call = fillImpl<N, T>;
 };
+
+template <typename N, typename T>
+using fill = call<Fill, N, T>;
 
 /*
  * Append to a list
@@ -145,6 +154,9 @@ public:
     using Call = concat<TList1, TList2>;
 };
 
+template <typename TList1, typename TList2>
+using concat = call<Concat, TList1, TList2>;
+
 /*
  * Filter
  */
@@ -158,7 +170,7 @@ class Filter
     template<typename FilterF, typename THead, typename TTail>
     struct FilterImpl<FilterF, List<THead, TTail>>
     {
-        using Type = Select::Call<
+        using Type = select<
     /*If*/   call<FilterF,THead>,
     /*Then*/ List<THead, filter<FilterF,TTail>>,
     /*Else*/ filter<FilterF,TTail>
@@ -202,6 +214,9 @@ public:
     template <typename F, typename TList>
     using Call = map<F, TList>;
 };
+
+template <typename F, typename TList>
+using map = call<Map, F, TList>;
 
 /*
  * Zip function
@@ -251,7 +266,7 @@ class Flatten
     template<typename THead, typename TTail>
     struct FlattenSelect<Bool<true>, List<THead, TTail>>
     {
-        using Type = Concat::Call<flatten<THead>, flatten<TTail>>;
+        using Type = concat<flatten<THead>, flatten<TTail>>;
     };
 
     template<typename THead, typename TTail>
@@ -263,7 +278,7 @@ class Flatten
     template<typename THead, typename TTail, typename Extra>
     struct FlattenImpl< List<THead, TTail>, Extra >
     {
-        using Type = flatten_s<IsList::Call<THead>, List<THead, TTail>>;
+        using Type = flatten_s<is_list<THead>, List<THead, TTail>>;
     };
 
     template<typename Extra>
@@ -307,6 +322,10 @@ public:
     using Call = zip_app<Fs, Args>;
 };
 
+template <typename Fs, typename Args>
+using zip_apply = call<ZipApply, Fs, Args>;
+
+
 /*
  * MapN
  * Takes a function of N arguments, and N lists of length M
@@ -324,7 +343,7 @@ class MapN
     template <typename F, typename Acc, typename TFirst, typename... TRest>
     struct MapNImpl<F, Acc, TFirst, TRest...>
     {
-        using Type = mapN<F, ZipApply::Call<Acc, TFirst>, TRest...>;
+        using Type = mapN<F, zip_apply<Acc, TFirst>, TRest...>;
     };
 
     struct FinalApply
@@ -336,7 +355,7 @@ class MapN
     template <typename F, typename Acc>
     struct MapNImpl<F, Acc>
     {
-        using Type = Map::Call<FinalApply, Acc>;
+        using Type = map<FinalApply, Acc>;
     };
 
     // If given empty lists
@@ -349,7 +368,7 @@ class MapN
     template <typename F, typename TFirst, typename... TRest>
     struct MapNImpl<F, void, TFirst, TRest...>
     {
-        using Type = mapN<F, Fill::Call<Length::Call<TFirst>, Curry::Call<F>>, TFirst, TRest...>;
+        using Type = mapN<F, fill<length<TFirst>, curry<F>>, TFirst, TRest...>;
     };
 
 public:
