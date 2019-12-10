@@ -76,16 +76,14 @@ using select = call<Select, TakeFirst, TFirst, TSecond>;
 
 /*
  * Curry
- * At the moment, requires a final Call after all arguments supplied
  */
-class Curry
+struct Curry
 {
-public:
     template <typename F, typename... ArgsSoFar>
     struct CurryImpl;
 
-    template <typename F, typename... Args, typename CheckIfValid = call<F, Args...>>
-    static constexpr CheckIfValid get_next_call(std::nullptr_t);
+    template <typename F, typename... Args, typename ValidCall = call<F, Args...>>
+    static constexpr ValidCall get_next_call(std::nullptr_t);
 
     template <typename F, typename... Args>
     static constexpr CurryImpl<F, Args...> get_next_call(...);
@@ -97,7 +95,6 @@ public:
         using Call = decltype(get_next_call<F, ArgsSoFar..., ArgsToCome...>(nullptr));
     };
 
-public:
     template <typename F, typename... ArgsSoFar>
     using Call = decltype(get_next_call<F, ArgsSoFar...>(nullptr));
 };
@@ -114,9 +111,6 @@ struct Int : public Val<int, I>
 
 /*
  * Test curried function, returns Bool<true> if passed Int<0>
- * Ideally should just be able to write
- * using IsZero = Curry::Call<Equals, Int<0>>
- * but can't do that due to the final Result required
  */
 using IsZero = curry<Equals, Int<0>>;
 
