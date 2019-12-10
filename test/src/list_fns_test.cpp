@@ -34,7 +34,7 @@ void test_list_fns()
             call< call< Curry::Call<Equals>, int>, int>
         >(),
         "Test that the head of a list of curried functions can be called mutliple times");
-    static_assert(call< call< head< make_t<Curry::Call<Equals>> >, int>, int>::Result::Value,
+    static_assert(call< call< head< make_t<curry<Equals>> >, int>, int>::Value,
         "Test that the head of a list of curried functions can be called mutliple times and return a value");
 
     // Test is_list
@@ -155,7 +155,7 @@ void test_list_fns()
     "Testing Zip Apply");
 
     // Test MapN
-    static_assert(std::is_same<MapN::Call<IsZero, void>, void>(),
+    /*static_assert(std::is_same<MapN::Call<IsZero, void>, void>(),
         "Testing mapN on empty list");
     static_assert(std::is_same<MapN::Call<Equals, void, void>, void>(),
         "Testing mapN on empty lists");
@@ -176,6 +176,6 @@ void test_list_fns()
             MapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<int, float>>,
             make_t<int, float>
         >(),
-        "Testing MapN on three argument function Select");
+        "Testing MapN on three argument function Select");*/
 
 }

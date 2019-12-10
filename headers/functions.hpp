@@ -81,32 +81,25 @@ using select = call<Select, TakeFirst, TFirst, TSecond>;
 class Curry
 {
 public:
-    template <typename F, typename... Args, typename CheckIfValid = call<F, Args...>>
-    static constexpr Bool<true> is_valid_call(std::nullptr_t);
-
-    template <typename F, typename... Args>
-    static constexpr Bool<false> is_valid_call(...);
-
-private:
-    template <typename IsValid, typename F, typename... ArgsSoFar>
+    template <typename F, typename... ArgsSoFar>
     struct CurryImpl;
 
-    template <typename F, typename... AllArgs>
-    struct CurryImpl<Bool<true>, F, AllArgs...>
-    {
-        using Result = call<F, AllArgs...>;
-    };
+    template <typename F, typename... Args, typename CheckIfValid = call<F, Args...>>
+    static constexpr CheckIfValid get_next_call(std::nullptr_t);
+
+    template <typename F, typename... Args>
+    static constexpr CurryImpl<F, Args...> get_next_call(...);
 
     template <typename F, typename... ArgsSoFar>
-    struct CurryImpl<Bool<false>, F, ArgsSoFar...>
+    struct CurryImpl
     {
         template <typename... ArgsToCome>
-        using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar..., ArgsToCome...>(nullptr)), F, ArgsSoFar..., ArgsToCome...>;
+        using Call = decltype(get_next_call<F, ArgsSoFar..., ArgsToCome...>(nullptr));
     };
 
 public:
     template <typename F, typename... ArgsSoFar>
-    using Call = CurryImpl<decltype(is_valid_call<F, ArgsSoFar...>(nullptr)), F, ArgsSoFar...>;
+    using Call = decltype(get_next_call<F, ArgsSoFar...>(nullptr));
 };
 
 template <typename F, typename... ArgsSoFar>
@@ -125,11 +118,7 @@ struct Int : public Val<int, I>
  * using IsZero = Curry::Call<Equals, Int<0>>
  * but can't do that due to the final Result required
  */
-struct IsZero
-{
-    template <typename T>
-    using Call = typename curry<Equals, Int<0>, T>::Result;
-};
+using IsZero = curry<Equals, Int<0>>;
 
 /*
  * Factorial

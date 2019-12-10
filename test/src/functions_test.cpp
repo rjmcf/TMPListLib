@@ -50,13 +50,13 @@ void test_functions()
         "Testing that call<Select, false> correctly selects the second value");
 
     // Test Curry
-    static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Result::Value,
+    static_assert(Curry::Call<Equals>::Call<int>::Call<int>::Value,
         "Testing that Curry with all arguments supplied returns the correct result (true)");
-    static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Result::Value,
+    static_assert(!Curry::Call<Equals>::Call<int>::Call<float>::Value,
         "Testing that Curry with all arguments supplied returns the correct result (false)");
-    static_assert(curry<Equals>::Call<int>::Call<int>::Result::Value,
+    static_assert(curry<Equals>::Call<int>::Call<int>::Value,
         "Testing that curry with all arguments supplied returns the correct result (true)");
-    static_assert(!curry<Equals>::Call<int>::Call<float>::Result::Value,
+    static_assert(!curry<Equals>::Call<int>::Call<float>::Value,
         "Testing that curry with all arguments supplied returns the correct result (false)");
     // @TODO add more tests of Curry
 

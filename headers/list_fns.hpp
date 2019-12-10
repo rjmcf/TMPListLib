@@ -333,7 +333,7 @@ using zip_apply = call<ZipApply, Fs, Args>;
  * result of applying the function to all the ith elements of
  * the N lists.
  */
-class MapN
+/*class MapN
 {
     template <typename F, typename Acc, typename... TLists>
     struct MapNImpl;
@@ -374,6 +374,6 @@ class MapN
 public:
     template <typename F, typename... TLists>
     using Call = mapN<F, void, TLists...>;
-};
+};*/
 
 #endif
