@@ -155,7 +155,7 @@ void test_list_fns()
     "Testing Zip Apply");
 
     // Test MapN
-    /*static_assert(std::is_same<MapN::Call<IsZero, void>, void>(),
+    static_assert(std::is_same<MapN::Call<IsZero, void>, void>(),
         "Testing mapN on empty list");
     static_assert(std::is_same<MapN::Call<Equals, void, void>, void>(),
         "Testing mapN on empty lists");
@@ -176,6 +176,5 @@ void test_list_fns()
             MapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<int, float>>,
             make_t<int, float>
         >(),
-        "Testing MapN on three argument function Select");*/
-
+        "Testing MapN on three argument function Select");
 }
