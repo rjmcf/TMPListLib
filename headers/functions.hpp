@@ -8,6 +8,7 @@
 template<typename T, T N>
 struct Val
 {
+    using Type = T;
     static constexpr T Value{N};
 };
 
