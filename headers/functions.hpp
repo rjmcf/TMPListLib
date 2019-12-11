@@ -52,18 +52,18 @@ class Select
     struct SelectImpl;
 
     template <typename TakeFirst, typename TFirst, typename TSecond>
-    using selectImpl = typename SelectImpl<TakeFirst, TFirst, TSecond>::Type;
+    using selectImpl = typename SelectImpl<TakeFirst, TFirst, TSecond>::Ret;
 
     template <typename TFirst, typename TSecond>
     struct SelectImpl<Bool<true>, TFirst, TSecond>
     {
-        using Type = TFirst;
+        using Ret = TFirst;
     };
 
     template <typename TFirst, typename TSecond>
     struct SelectImpl<Bool<false>, TFirst, TSecond>
     {
-        using Type = TSecond;
+        using Ret = TSecond;
     };
 
 public:
@@ -122,18 +122,18 @@ class Factorial
     template <typename N, typename>
     struct FactImpl;
     template <typename N, typename Extra = void>
-    using fact = typename FactImpl<N, Extra>::Type;
+    using fact = typename FactImpl<N, Extra>::Ret;
 
     template <int N, typename Extra>
     struct FactImpl<Int<N>, Extra>
     {
-        using Type = Int<N * fact<Int<N-1>>::Value>;
+        using Ret = Int<N * fact<Int<N-1>>::Value>;
     };
 
     template<typename Extra>
     struct FactImpl<Int<0>, Extra>
     {
-        using Type = Int<1>;
+        using Ret = Int<1>;
     };
 
 public:

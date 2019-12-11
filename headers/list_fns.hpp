@@ -12,22 +12,22 @@ class IsList
     template <typename T, typename>
     struct IsListImpl
     {
-        using Type = Bool<false>;
+        using Ret = Bool<false>;
     };
 
     template <typename T, typename Extra = void>
-    using is_listImpl = typename IsListImpl<T, Extra>::Type;
+    using is_listImpl = typename IsListImpl<T, Extra>::Ret;
 
     template <typename THead, typename TTail, typename Extra>
     struct IsListImpl<List<THead, TTail>, Extra>
     {
-        using Type = Bool<true>;
+        using Ret = Bool<true>;
     };
 
     template <typename Extra>
     struct IsListImpl<void, Extra>
     {
-        using Type = Bool<true>;
+        using Ret = Bool<true>;
     };
 
 public:
@@ -46,18 +46,18 @@ class Length
     template <typename TList, typename>
     struct LengthImpl;
     template <typename TList, typename Extra = void>
-    using lengthImpl = typename LengthImpl<TList, Extra>::Type;
+    using lengthImpl = typename LengthImpl<TList, Extra>::Ret;
 
     template <typename THead, typename TTail, typename Extra>
     struct LengthImpl<List<THead, TTail>, Extra>
     {
-        using Type = Int<1 + lengthImpl<TTail>::Value>;
+        using Ret = Int<1 + lengthImpl<TTail>::Value>;
     };
 
     template<typename Extra>
     struct LengthImpl<void, Extra>
     {
-        using Type = Int<0>;
+        using Ret = Int<0>;
     };
 
 public:
@@ -76,18 +76,18 @@ class Fill
     template <typename N, typename T>
     struct FillImpl;
     template <typename N, typename T>
-    using fillImpl = typename FillImpl<N,T>::Type;
+    using fillImpl = typename FillImpl<N,T>::Ret;
 
     template <int N, typename T>
     struct FillImpl<Int<N>, T>
     {
-        using Type = List<T, fillImpl<Int<N-1>,T>>;
+        using Ret = List<T, fillImpl<Int<N-1>,T>>;
     };
 
     template <typename T>
     struct FillImpl<Int<0>, T>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -107,18 +107,18 @@ class Append
     struct AppendImpl;
 
     template <typename T, typename TList>
-    using append = typename AppendImpl<T,TList>::Type;
+    using append = typename AppendImpl<T,TList>::Ret;
 
     template <typename T, typename THead, typename TTail>
     struct AppendImpl<T, List<THead, TTail>>
     {
-        using Type = List<THead, typename AppendImpl<T, TTail>::Type>;
+        using Ret = List<THead, typename AppendImpl<T, TTail>::Ret>;
     };
 
     template <typename T>
     struct AppendImpl<T, void>
     {
-        using Type = List<T, void>;
+        using Ret = List<T, void>;
     };
 
 public:
@@ -135,18 +135,18 @@ class Concat
     struct ConcatImpl;
 
     template <typename TList1, typename TList2>
-    using concat = typename ConcatImpl<TList1, TList2>::Type;
+    using concat = typename ConcatImpl<TList1, TList2>::Ret;
 
     template <typename THead, typename TTail, typename TList2>
     struct ConcatImpl<List<THead, TTail>, TList2>
     {
-        using Type = List<THead, typename ConcatImpl<TTail, TList2>::Type>;
+        using Ret = List<THead, typename ConcatImpl<TTail, TList2>::Ret>;
     };
 
     template <typename TList2>
     struct ConcatImpl<void, TList2>
     {
-        using Type = TList2;
+        using Ret = TList2;
     };
 
 public:
@@ -165,12 +165,12 @@ class Filter
     template<typename FilterF, typename TList>
     struct FilterImpl;
     template<typename FilterF, typename TList>
-    using filter = typename FilterImpl<FilterF, TList>::Type;
+    using filter = typename FilterImpl<FilterF, TList>::Ret;
 
     template<typename FilterF, typename THead, typename TTail>
     struct FilterImpl<FilterF, List<THead, TTail>>
     {
-        using Type = select<
+        using Ret = select<
     /*If*/   call<FilterF,THead>,
     /*Then*/ List<THead, filter<FilterF,TTail>>,
     /*Else*/ filter<FilterF,TTail>
@@ -180,7 +180,7 @@ class Filter
     template<typename FilterF>
     struct FilterImpl<FilterF, void>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -196,18 +196,18 @@ class Map
     template <typename F, typename TList>
     struct MapImpl;
     template <typename F, typename TList>
-    using map = typename MapImpl<F, TList>::Type;
+    using map = typename MapImpl<F, TList>::Ret;
 
     template <typename F, typename THead, typename TTail>
     struct MapImpl<F, List<THead, TTail>>
     {
-        using Type = List<call<F, THead>, map<F, TTail>>;
+        using Ret = List<call<F, THead>, map<F, TTail>>;
     };
 
     template <typename F>
     struct MapImpl<F, void>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -226,18 +226,18 @@ class Zip
     template <typename TList1, typename TList2, typename>
     struct ZipImpl;
     template <typename TList1, typename TList2, typename Extra = void>
-    using zip = typename ZipImpl<TList1, TList2, Extra>::Type;
+    using zip = typename ZipImpl<TList1, TList2, Extra>::Ret;
 
     template <typename THead1, typename TTail1, typename THead2, typename TTail2, typename Extra>
     struct ZipImpl<List<THead1, TTail1>, List<THead2, TTail2>, Extra>
     {
-        using Type = List<make_t<THead1, THead2>, zip<TTail1, TTail2>>;
+        using Ret = List<make_t<THead1, THead2>, zip<TTail1, TTail2>>;
     };
 
     template<typename Extra>
     struct ZipImpl<void, void, Extra>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -253,7 +253,7 @@ class Flatten
     template <typename TList, typename>
     struct FlattenImpl;
     template <typename TList, typename Extra = void>
-    using flatten = typename FlattenImpl<TList, Extra>::Type;
+    using flatten = typename FlattenImpl<TList, Extra>::Ret;
 
     // Need separate FlattenSelect partial specs, since
     // some types would be invalid if written as single
@@ -261,30 +261,30 @@ class Flatten
     template<typename IsList, typename TList>
     struct FlattenSelect;
     template<typename IsList, typename TList>
-    using flatten_s = typename FlattenSelect<IsList, TList>::Type;
+    using flatten_s = typename FlattenSelect<IsList, TList>::Ret;
 
     template<typename THead, typename TTail>
     struct FlattenSelect<Bool<true>, List<THead, TTail>>
     {
-        using Type = concat<flatten<THead>, flatten<TTail>>;
+        using Ret = concat<flatten<THead>, flatten<TTail>>;
     };
 
     template<typename THead, typename TTail>
     struct FlattenSelect<Bool<false>, List<THead, TTail>>
     {
-        using Type = List<THead, flatten<TTail>>;
+        using Ret = List<THead, flatten<TTail>>;
     };
 
     template<typename THead, typename TTail, typename Extra>
     struct FlattenImpl< List<THead, TTail>, Extra >
     {
-        using Type = flatten_s<is_list<THead>, List<THead, TTail>>;
+        using Ret = flatten_s<is_list<THead>, List<THead, TTail>>;
     };
 
     template<typename Extra>
     struct FlattenImpl<void, Extra>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -303,18 +303,18 @@ class ZipApply
     template <typename Fs, typename Args, typename>
     struct ZipAppImpl;
     template <typename Fs, typename Args, typename Extra = void>
-    using zip_app = typename ZipAppImpl<Fs, Args, Extra>::Type;
+    using zip_app = typename ZipAppImpl<Fs, Args, Extra>::Ret;
 
     template <typename FHead, typename FTail, typename AHead, typename ATail, typename Extra>
     struct ZipAppImpl<List<FHead, FTail>, List<AHead, ATail>, Extra>
     {
-        using Type = List<call<FHead, AHead>, zip_app<FTail, ATail>>;
+        using Ret = List<call<FHead, AHead>, zip_app<FTail, ATail>>;
     };
 
     template <typename Extra>
     struct ZipAppImpl<void, void, Extra>
     {
-        using Type = void;
+        using Ret = void;
     };
 
 public:
@@ -338,31 +338,31 @@ class MapN
     template <typename F, typename Acc, typename... TLists>
     struct MapNImpl;
     template <typename F, typename Acc, typename... TLists>
-    using mapN = typename MapNImpl<F, Acc, TLists...>::Type;
+    using mapN = typename MapNImpl<F, Acc, TLists...>::Ret;
 
     template <typename F, typename Acc, typename TFirst, typename... TRest>
     struct MapNImpl<F, Acc, TFirst, TRest...>
     {
-        using Type = mapN<F, zip_apply<Acc, TFirst>, TRest...>;
+        using Ret = mapN<F, zip_apply<Acc, TFirst>, TRest...>;
     };
 
     template <typename F, typename Acc>
     struct MapNImpl<F, Acc>
     {
-        using Type = Acc;
+        using Ret = Acc;
     };
 
     // If given empty lists
     template <typename F, typename... Empties>
     struct MapNImpl<F, void, void, Empties...>
     {
-        using Type = void;
+        using Ret = void;
     };
 
     template <typename F, typename TFirst, typename... TRest>
     struct MapNImpl<F, void, TFirst, TRest...>
     {
-        using Type = mapN<F, fill<length<TFirst>, curry<F>>, TFirst, TRest...>;
+        using Ret = mapN<F, fill<length<TFirst>, curry<F>>, TFirst, TRest...>;
     };
 
 public:
