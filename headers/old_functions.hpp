@@ -102,12 +102,11 @@ struct FList
 
 /*
  * Function taking function list
- * Non-standard, won't compile everywhere
  */
-/*template <template<template <typename...> class, typename> class THead, typename TTail>
+template <template<template <typename...> class, typename> class THead, typename TTail>
 struct FFList
 {
     template<template <typename...> class F, typename TList>
     using Head = THead<F, TList>;
     using Tail = TTail;
-};*/
+};

@@ -41,7 +41,9 @@ void test_old_functions()
     // Even FLists of functions that take functions won't work
     //FList<Filter, void> badFList;
 
-    // Shouldn't even define a type of list that stores functions that take functions!
-    // Since template template template arguments aren't allowed by the standard
-    //FFList<Filter, void> badFFList;
+    // Supposedly template template template arguments are standards compliant
+    // but they're also a bit silly. The fact that functions were different from 
+    // values and functions that take functions were different from normal functions
+    // is why I moved away from this implementation
+    FFList<Filter, void> badFFList;
 }
