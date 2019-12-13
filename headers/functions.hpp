@@ -84,10 +84,10 @@ struct Curry
     struct CurryImpl;
 
     template <typename F, typename... Args, typename ValidCall = call<F, Args...>>
-    static constexpr ValidCall get_next_call(std::nullptr_t);
+    static ValidCall get_next_call(std::nullptr_t);
 
     template <typename F, typename... Args>
-    static constexpr CurryImpl<F, Args...> get_next_call(...);
+    static CurryImpl<F, Args...> get_next_call(...);
 
     template <typename F, typename... ArgsSoFar>
     struct CurryImpl
