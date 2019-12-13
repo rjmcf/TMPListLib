@@ -92,16 +92,16 @@ struct Curry
     template <typename F, typename... ArgsSoFar>
     struct CurryImpl
     {
-        template <typename... ArgsToCome>
-        using Call = decltype(get_next_call<F, ArgsSoFar..., ArgsToCome...>(nullptr));
+        template <typename NextArg>
+        using Call = decltype(get_next_call<F, ArgsSoFar..., NextArg>(nullptr));
     };
 
-    template <typename F, typename... ArgsSoFar>
-    using Call = decltype(get_next_call<F, ArgsSoFar...>(nullptr));
+    template <typename F>
+    using Call = decltype(get_next_call<F>(nullptr));
 };
 
-template <typename F, typename... ArgsSoFar>
-using curry = call<Curry, F, ArgsSoFar...>;
+template <typename F>
+using curry = call<Curry, F>;
 
 /*
  * Int Values
@@ -111,9 +111,9 @@ struct Int : public Val<int, I>
 {};
 
 /*
- * Test curried function, returns Bool<true> if passed Int<0>
+ * Test paritally applied function, returns Bool<true> if passed Int<0>
  */
-using IsZero = curry<Equals, Int<0>>;
+using IsZero = curry<Equals>::Call<Int<0>>;
 
 /*
  * Factorial
