@@ -83,8 +83,8 @@ struct Curry
     template <typename F, typename... ArgsSoFar>
     struct CurryImpl;
 
-    template <typename F, typename... Args, typename ValidCall = call<F, Args...>>
-    static ValidCall get_next_call(std::nullptr_t);
+    template <typename F, typename... Args, typename Result = call<F, Args...>>
+    static Result get_next_call(std::nullptr_t);
 
     template <typename F, typename... Args>
     static CurryImpl<F, Args...> get_next_call(...);
@@ -97,7 +97,7 @@ struct Curry
     };
 
     template <typename F>
-    using Call = decltype(get_next_call<F>(nullptr));
+    using Call = CurryImpl<F>;
 };
 
 template <typename F>
