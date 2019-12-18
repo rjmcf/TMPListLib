@@ -42,8 +42,10 @@ void test_old_functions()
     //FList<Filter, void> badFList;
 
     // Supposedly template template template arguments are standards compliant
-    // but they're also a bit silly. The fact that functions were different from 
+    // but they're also a bit silly. The fact that functions were different from
     // values and functions that take functions were different from normal functions
     // is why I moved away from this implementation
-    FFList<Filter, void> badFFList;
+    using TestFFList = FFList<Filter, void>;
+    static_assert(std::is_same<TestFFList, TestFFList>(),
+        "Testing FFList can store Filter");
 }

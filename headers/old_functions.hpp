@@ -1,3 +1,6 @@
+#ifndef OLD_FUNCTIONS_H
+#define OLD_FUNCTIONS_H
+
 #include "type_list.hpp"
 
 /*
@@ -110,3 +113,5 @@ struct FFList
     using Head = THead<F, TList>;
     using Tail = TTail;
 };
+
+#endif 
