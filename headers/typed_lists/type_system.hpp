@@ -19,9 +19,16 @@ struct IntType : public Type
 struct BoolType : public Type
 {};
 
+// A type that represents a list of a specific type
+template <typename EType>
+struct ListType : public Type
+{
+    using ElementType = EType;
+};
+
 // Used for deciding whether we can convert from one type to another
 template <typename FromType, typename ToType>
-struct IsConvertible
+struct Conversion
 {
     static const bool Ret = false;
 };
@@ -29,15 +36,15 @@ struct IsConvertible
 template <typename FromType, typename ToType>
 constexpr bool is_convertible()
 {
-    return IsConvertible<FromType, ToType>::Ret;
+    return Conversion<FromType, ToType>::Ret;
 }
 
 template <typename FromType, typename ToType>
-using convert_to = typename IsConvertible<FromType, ToType>::Type;
+using convert_to = typename Conversion<FromType, ToType>::Type;
 
 // The AnyType can convert to any type
 template <typename T>
-struct IsConvertible<AnyType, T>
+struct Conversion<AnyType, T>
 {
     static const bool Ret = true;
     using Type = T;
@@ -46,7 +53,7 @@ struct IsConvertible<AnyType, T>
 // Specify that AnyType is convertible to itself
 // @TODO this may not be correct implementation!
 template <>
-struct IsConvertible<AnyType, AnyType>
+struct Conversion<AnyType, AnyType>
 {
     static const bool Ret = true;
     using Type = AnyType;
@@ -54,10 +61,27 @@ struct IsConvertible<AnyType, AnyType>
 
 // A type is always convertible to itself
 template <typename T>
-struct IsConvertible<T, T>
+struct Conversion<T, T>
 {
     static const bool Ret = true;
     using Type = T;
+};
+
+// Converting list types depends on converting their element types
+template <typename FromType, typename ToType>
+struct Conversion<ListType<FromType>, ListType<ToType>>
+{
+    static const bool Ret = is_convertible<FromType, ToType>();
+    // @TODO only provide type if conversion succeeds
+    using Type = ListType<ToType>;
+};
+
+// Specify that lists of the same type always convert
+template <typename T>
+struct Conversion<ListType<T>, ListType<T>>
+{
+    static const bool Ret = true;
+    using Type = ListType<T>;
 };
 
 #endif
