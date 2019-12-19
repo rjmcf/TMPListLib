@@ -8,6 +8,10 @@ struct Type
 {};
 
 // A type that can represent any type
+// @TODO work out way to distinguish AnyTypes, for instance the difference between
+// 'a -> 'a list -> 'a list
+// and
+// 'b -> 'a list -> 'a list
 struct AnyType : public Type
 {};
 
