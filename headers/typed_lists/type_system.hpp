@@ -44,6 +44,9 @@ constexpr bool is_convertible()
 }
 
 template <typename FromType, typename ToType>
+using RequireMatch = std::enable_if_t<is_convertible<FromType, ToType>()>;
+
+template <typename FromType, typename ToType>
 using convert_to = typename Conversion<FromType, ToType>::Type;
 
 // The AnyType can convert to any type

@@ -2,9 +2,10 @@ SUB_PROJECT = typed_lists
 SRC_H_DIR = headers/$(SUB_PROJECT)
 SRC_CPP_DIR = src
 TEST_H_DIR = test/headers/$(SUB_PROJECT)
+TEST_SHARED_H_DIR = test/headers/shared
 TEST_CPP_DIR = test/src/$(SUB_PROJECT)
 OBJ_DIR = output
-CFLAGS  = -Wall -I$(SRC_H_DIR) -I$(TEST_H_DIR) -MMD -MP -std=c++14
+CFLAGS  = -Wall -I$(SRC_H_DIR) -I$(TEST_H_DIR) -I$(TEST_SHARED_H_DIR) -MMD -MP -std=c++14
 SRCS = $(wildcard $(SRC_CPP_DIR)/*.cpp)
 TEST_SRCS = $(wildcard $(TEST_CPP_DIR)/*.cpp)
 OBJS = $(patsubst $(SRC_CPP_DIR)/%,$(OBJ_DIR)/%,$(SRCS:.cpp=.o))
