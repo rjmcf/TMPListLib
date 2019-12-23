@@ -34,5 +34,8 @@ $(OBJ_DIR)/%.o: $(TEST_CPP_DIR)/%.cpp
 clean:
 	rm $(OBJ_DIR)/*
 
+todo:
+	grep -rn "TODO" *
+
 -include $(patsubst $(SRC_CPP_DIR)/%,$(OBJ_DIR)/%,$(OBJS:.o=.d))
 -include $(patsubst $(TEST_CPP_DIR)/%,$(OBJ_DIR)/%,$(TEST_OBJS:.o=.d))
