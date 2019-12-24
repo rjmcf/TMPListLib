@@ -50,7 +50,7 @@ private:
     // This definition limits the Not function to only taking BoolType inputs,
     // or things that BoolType can convert to. Thus, even though the int value
     // of an IntType would be converted to bool and this could compile, it won't
-    template<typename TIn>
+    template <typename TIn>
     struct NotImpl<TIn, RequireMatch<InputType, TypeOf<TIn>>>
     {
         using Ret = Bool<!TIn::Value>;
@@ -59,6 +59,34 @@ private:
 public:
     template <typename TIn>
     using Call = notImpl<TIn>;
+};
+
+/*
+ * And Function
+ */
+struct And
+{
+    using InputType = BoolType;
+
+private:
+    template <typename TFirst, typename TSecond, typename Enable = void>
+    struct AndImpl;
+
+    template <typename TFirst, typename TSecond>
+    using andImpl = typename AndImpl<TFirst, TSecond>::Ret;
+
+    template <typename TFirst, typename TSecond>
+    struct AndImpl<TFirst, TSecond, RequireMatches<
+        Pair<InputType, TypeOf<TFirst>>,
+        Pair<InputType, TypeOf<TSecond>>
+    >>
+    {
+        using Ret = Bool<TFirst::Value && TSecond::Value>;
+    };
+
+public:
+    template <typename TFirst, typename TSecond>
+    using Call = andImpl<TFirst, TSecond>;
 };
 
 #endif

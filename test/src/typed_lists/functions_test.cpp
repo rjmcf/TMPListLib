@@ -33,4 +33,27 @@ void test_functions()
         Can't call Not with Int value");
     static_assert(false, "checking <functions01>");
 #endif
+
+    // Test And function
+    static_assert(And::Call<Bool<true>, Bool<true>>::Value,
+        "Test that And returns true");
+    static_assert(!And::Call<Bool<false>, Bool<true>>::Value,
+        "Test that And returns false when first is false");
+    static_assert(!And::Call<Bool<true>, Bool<false>>::Value,
+        "Test that And returns false when second is false");
+    static_assert(!And::Call<Bool<false>, Bool<false>>::Value,
+        "Test that And returns false when both are false");
+    static_assert(is_convertible<And::Call<Bool<true>, Bool<true>>::Type, BoolType>(),
+        "Test that And returns a BoolType");
+#if !AVOID_FAILURE_TESTS
+    static_assert(And::Call<Int<1>, Bool<true>>::Value, "FAIL <functions02>:\
+        Can't call And with Int value");
+    static_assert(false, "checking <functions02>");
+    static_assert(And::Call<Bool<true>, Int<1>>::Value, "FAIL <functions03>:\
+        Can't call And with Int value");
+    static_assert(false, "checking <functions03>");
+    static_assert(And::Call<Int<1>, Int<1>>::Value, "FAIL <functions04>:\
+        Can't call And with Int values");
+    static_assert(false, "checking <functions04>");
+#endif
 }

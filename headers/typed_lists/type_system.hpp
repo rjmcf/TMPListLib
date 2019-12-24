@@ -91,4 +91,40 @@ struct Conversion<ListType<T>, ListType<T>>
     using Type = ListType<T>;
 };
 
+// Used for deciding whether each pair has a first that can be converted to the second
+template <typename FirstType, typename SecondType>
+struct Pair
+{
+    using First = FirstType;
+    using Second = SecondType;
+};
+
+template <typename TPair>
+using first = typename TPair::First;
+template <typename TPair>
+using second = typename TPair::Second;
+
+template <typename... TPairs>
+struct AllConvertible;
+template <typename... TPairs>
+constexpr bool all_convertible()
+{
+    return AllConvertible<TPairs...>::Ret;
+}
+
+template <typename FromType, typename ToType, typename... TPairs>
+struct AllConvertible<Pair<FromType, ToType>, TPairs...>
+{
+    static const bool Ret = is_convertible<FromType, ToType>() && all_convertible<TPairs...>();
+};
+
+template <>
+struct AllConvertible<>
+{
+    static const bool Ret = true;
+};
+
+template <typename... TPairs>
+using RequireMatches = std::enable_if_t<all_convertible<TPairs...>()>;
+
 #endif
