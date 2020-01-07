@@ -34,12 +34,19 @@ struct Bool : Val<BoolType>
 };
 
 /*
+ * Function semantics
+ */
+template <typename ReturnType, typename... ParamTypes>
+struct Function
+{
+    using Type = FunctionType<ReturnType, ParamTypes...>;
+};
+
+/*
  * Not function
  */
-struct Not
+struct Not : public Function<BoolType, BoolType>
 {
-    using InputType = BoolType;
-
 private:
     template <typename TIn, typename Enable = void>
     struct NotImpl;
@@ -51,7 +58,7 @@ private:
     // or things that BoolType can convert to. Thus, even though the int value
     // of an IntType would be converted to bool and this could compile, it won't
     template <typename TIn>
-    struct NotImpl<TIn, RequireMatch<InputType, TypeOf<TIn>>>
+    struct NotImpl<TIn, RequireMatches<Type::ParamTypes, TypeOf<TIn>>>
     {
         using Ret = Bool<!TIn::Value>;
     };
@@ -64,10 +71,8 @@ public:
 /*
  * And Function
  */
-struct And
+struct And : public Function<BoolType, BoolType, BoolType>
 {
-    using InputType = BoolType;
-
 private:
     template <typename TFirst, typename TSecond, typename Enable = void>
     struct AndImpl;
@@ -76,10 +81,7 @@ private:
     using andImpl = typename AndImpl<TFirst, TSecond>::Ret;
 
     template <typename TFirst, typename TSecond>
-    struct AndImpl<TFirst, TSecond, RequireMatches<
-        Pair<InputType, TypeOf<TFirst>>,
-        Pair<InputType, TypeOf<TSecond>>
-    >>
+    struct AndImpl<TFirst, TSecond, RequireMatches<Type::ParamTypes, TypeOf<TFirst>, TypeOf<TSecond> > >
     {
         using Ret = Bool<TFirst::Value && TSecond::Value>;
     };

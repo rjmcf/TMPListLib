@@ -15,19 +15,52 @@ struct Type
 struct AnyType : public Type
 {};
 
-// A type that represents ints
+// The type for integers
 struct IntType : public Type
 {};
 
-// A type that represents bools
+// The type for bools
 struct BoolType : public Type
 {};
 
-// A type that represents a list of a specific type
+// The type for lists containing elements of a specific type
 template <typename EType>
 struct ListType : public Type
 {
     using ElementType = EType;
+};
+
+// Storing a list of parameter types
+template <typename TFirst, typename TOthers>
+struct ParamList
+{
+    using First = TFirst;
+    using Others = TOthers;
+};
+
+template <typename... TParams>
+struct MakeP;
+template <typename... TParams>
+using make_p = typename MakeP<TParams...>::Ret;
+
+template <typename TParam, typename... TParams>
+struct MakeP<TParam, TParams...>
+{
+    using Ret = ParamList<TParam, make_p<TParams...>>;
+};
+
+template <>
+struct MakeP<>
+{
+    using Ret = void;
+};
+
+// The type for functions
+template <typename TReturn, typename... TParamTypes>
+struct FunctionType : public Type
+{
+    using ReturnType = TReturn;
+    using ParamTypes = make_p<TParamTypes...>;
 };
 
 // Used for deciding whether we can convert from one type to another
@@ -48,6 +81,33 @@ using RequireMatch = std::enable_if_t<is_convertible<FromType, ToType>()>;
 
 template <typename FromType, typename ToType>
 using convert_to = typename Conversion<FromType, ToType>::Type;
+
+// Used for checking if the supplied param types can convert to the required param types
+template <typename ParamTypeList, typename... SuppliedParamTypes>
+struct AllConvertible;
+template <typename ParamTypeList, typename... SuppliedParamTypes>
+constexpr bool all_convertible()
+{
+    return AllConvertible<ParamTypeList, SuppliedParamTypes...>::Ret;
+}
+
+template <typename FirstParam, typename OtherParams, typename FirstSupplied, typename... TOthersSupplied>
+struct AllConvertible<ParamList<FirstParam, OtherParams>, FirstSupplied, TOthersSupplied...>
+{
+    static const bool Ret = is_convertible<FirstParam, FirstSupplied>() && all_convertible<OtherParams, TOthersSupplied...>();
+};
+
+template <>
+struct AllConvertible<void>
+{
+    static const bool Ret = true;
+};
+
+// SFINAE implementation for checking that a parameter pack of argument types can convert to the list of
+// parameter types
+template <typename ParamTypeList, typename... SuppliedParamTypes>
+using RequireMatches = std::enable_if_t<all_convertible<ParamTypeList, SuppliedParamTypes...>()>;
+
 
 // The AnyType can convert to any type
 template <typename T>
@@ -91,40 +151,6 @@ struct Conversion<ListType<T>, ListType<T>>
     using Type = ListType<T>;
 };
 
-// Used for deciding whether each pair has a first that can be converted to the second
-template <typename FirstType, typename SecondType>
-struct Pair
-{
-    using First = FirstType;
-    using Second = SecondType;
-};
-
-template <typename TPair>
-using first = typename TPair::First;
-template <typename TPair>
-using second = typename TPair::Second;
-
-template <typename... TPairs>
-struct AllConvertible;
-template <typename... TPairs>
-constexpr bool all_convertible()
-{
-    return AllConvertible<TPairs...>::Ret;
-}
-
-template <typename FromType, typename ToType, typename... TPairs>
-struct AllConvertible<Pair<FromType, ToType>, TPairs...>
-{
-    static const bool Ret = is_convertible<FromType, ToType>() && all_convertible<TPairs...>();
-};
-
-template <>
-struct AllConvertible<>
-{
-    static const bool Ret = true;
-};
-
-template <typename... TPairs>
-using RequireMatches = std::enable_if_t<all_convertible<TPairs...>()>;
+// @TODO decide whether function types can convert (and how)
 
 #endif
