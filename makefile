@@ -1,4 +1,4 @@
-SUB_PROJECT = typed_lists
+SUB_PROJECT = untyped_lists
 SRC_H_DIR = headers/$(SUB_PROJECT)
 SRC_CPP_DIR = src
 TEST_H_DIR = test/headers/$(SUB_PROJECT)

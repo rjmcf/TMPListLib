@@ -173,8 +173,32 @@ void test_list_fns()
         "Testing MapN on two argument function Equals");
     static_assert(
         std::is_same<
-            MapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<int, float>>,
+            MapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<float, float>>,
             make_t<int, float>
         >(),
         "Testing MapN on three argument function Select");
+
+    // Test SimpleMapN
+    static_assert(std::is_same<SimpleMapN::Call<IsZero, void>, void>(),
+        "Testing mapN on empty list");
+    static_assert(std::is_same<SimpleMapN::Call<Equals, void, void>, void>(),
+        "Testing mapN on empty lists");
+    static_assert(
+        std::is_same<
+            SimpleMapN::Call<IsZero, make_t<Int<0>, char>>,
+            make_t<Bool<true>, Bool<false>>
+        >(),
+        "Testing map on single argument function IsZero");
+    static_assert(
+        std::is_same<
+            SimpleMapN::Call<Equals, make_t<int, float, Int<0>>, make_t<int, int, Int<0>> >,
+            make_t<Bool<true>, Bool<false>, Bool<true>>
+        >(),
+        "Testing SimpleMapN on two argument function Equals");
+    static_assert(
+        std::is_same<
+            SimpleMapN::Call<Select, make_t<Bool<true>, Bool<false>>, make_t<int, int>, make_t<float, float>>,
+            make_t<int, float>
+        >(),
+        "Testing SimpleMapN on three argument function Select");
 }

@@ -370,4 +370,39 @@ public:
     using Call = mapN<F, void, TLists...>;
 };
 
+/*
+ * SimpleMapN implements MapN using a a trick with template packs
+ */
+class SimpleMapN
+{
+    template <typename F, typename... TLists>
+    struct MapNImpl;
+    template <typename F, typename... TLists>
+    using mapN = typename MapNImpl<F, TLists...>::Ret;
+
+    template <typename F, typename... TLists>
+    struct MapNImpl
+    {
+        // Pattern head<TLists> ... expands the pack to head<TList1>, head<TList2>, ...
+        using Ret = List< call<F, head<TLists>...>, mapN<F, tail<TLists>...> >;
+    };
+
+    // Explicitly deal with the case of empty lists, since head<void> is invalid
+    template <typename F, typename... TLists>
+    struct MapNImpl<F, void, TLists...>
+    {
+        using Ret = void;
+    };
+
+    template <typename F>
+    struct MapNImpl<F>
+    {
+        using Ret = void;
+    };
+
+public:
+    template <typename F, typename... TLists>
+    using Call = mapN<F, TLists...>;
+};
+
 #endif
