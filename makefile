@@ -1,6 +1,6 @@
 SUB_PROJECT = untyped_lists
 SRC_H_DIR = headers/$(SUB_PROJECT)
-SRC_CPP_DIR = src
+SRC_CPP_DIR = src/$(SUB_PROJECT)
 TEST_H_DIR = test/headers/$(SUB_PROJECT)
 TEST_SHARED_H_DIR = test/headers/shared
 TEST_CPP_DIR = test/src/$(SUB_PROJECT)
@@ -35,7 +35,7 @@ clean:
 	rm $(OBJ_DIR)/*
 
 todo:
-	grep -rn "TODO" *
+	grep -rn "TODO" headers src test
 
 -include $(patsubst $(SRC_CPP_DIR)/%,$(OBJ_DIR)/%,$(OBJS:.o=.d))
 -include $(patsubst $(TEST_CPP_DIR)/%,$(OBJ_DIR)/%,$(TEST_OBJS:.o=.d))
